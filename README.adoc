@@ -20,20 +20,23 @@ This playground application using link:https://quarkus.io/[Quarkus] covers vario
 
 Do not use this application as entire reference for final productive system, but rather for point-of-view and inspiration for the given topics.
 
-== Usage
+== Application Links
 
 .Helpful links
 |===
-| Home | link:http://localhost:8080/[]
-| Dev UI | link:http://localhost:8080/q/dev/[]
-| Health API | link:http://localhost:8080/q/health[]
-| Health UI | link:http://localhost:8080/q/health-ui/[]
+| Home | link:http://127.0.0.1:8080/[]
+| Dev UI | link:http://127.0.0.1:8080/q/dev/[]
+| Health API | link:http://127.0.0.1:8080/q/health[]
+| Health UI | link:http://127.0.0.1:8080/q/health-ui/[]
 | Swagger UI | link:http://127.0.0.1:8080/q/swagger-ui/[]
 | Metrics API | link:http://127.0.0.1:8080/q/metrics[]
 | | 
 | Secured API without role | link:http://127.0.0.1:8080/secured/date[]
-| Secured API with role | link:http://127.0.0.1:8080/secured/datetime[]
+| Secured API with role | link:http://127.0.0.1:8080/secured/dateForManager[]
+| Secured API with Backend call | link:http://127.0.0.1:8080/secured/user[]
 |===
+
+== Usage
 
 Listing of useful commands
 
