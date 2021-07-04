@@ -1,0 +1,213 @@
+= Quarkus Playground
+:author: Hafid Haddouti
+:toc: macro
+:toclevels: 4
+:sectlinks:
+:sectanchors:
+
+A link:https://quarkus.io/[Quarkus] playground application. 
+
+toc::[]
+
+== Overview
+
+This playground application using link:https://quarkus.io/[Quarkus] covers various topics like
+
+* Quarkus (v2) itself ;-)
+* Kubernetes/OpenShift deployment
+* REST/Microservice
+* Security aspects
+
+Do not use this application as entire reference for final productive system, but rather for point-of-view and inspiration for the given topics.
+
+== Usage
+
+.Helpful links
+|===
+| Home | link:http://localhost:8080/[]
+| Dev UI | link:http://localhost:8080/q/dev/[]
+| Health API | link:http://localhost:8080/q/health[]
+| Health UI | link:http://localhost:8080/q/health-ui/[]
+| Swagger UI | link:http://127.0.0.1:8080/q/swagger-ui/[]
+| Metrics API | link:http://127.0.0.1:8080/q/metrics[]
+| | 
+| Secured API without role | link:http://127.0.0.1:8080/secured/date[]
+| Secured API with role | link:http://127.0.0.1:8080/secured/datetime[]
+|===
+
+Listing of useful commands
+
+.Helpful start script with setting and overwriting env variables
+----
+#!/bin/sh
+
+export QUARKUS_OIDC_AUTH_SERVER_URL="https://idp-auth-server-url"
+export QUARKUS_OIDC_CLIENT_ID="defined-cient-id"
+#export QUARKUS_OIDC_TENANT_ID="defined-tenant-id-if-not-in-URL"
+export QUARKUS_OIDC_CREDENTIALS_SECRET="client-secret-value"
+export QUARKUS_OIDC_CLIENT_AUTH_SERVER_URL="https://idp-auth-server-url"
+export QUARKUS_OIDC_CLIENT_CLIENT_ID="defined-cient-id"
+#export QUARKUS_OIDC_CLIENT_TENANT_ID="defined-tenant-id-if-not-in-URL"
+export QUARKUS_OIDC_CLIENT_CREDENTIALS_SECRET="client-secret-value"
+
+./mvnw compile quarkus:dev
+----
+
+.Run in `dev` mode
+----
+./mvnw compile quarkus:dev
+----
+...this builds and executes the app in dev mode. Modification in source code will be detected and automatically applied, without triggering a re-build. This activates also link:https://quarkus.io/guides/continuous-testing[Continuous Testing]
+
+.Package application
+----
+./mvnw package
+----
+
+.Package `über-jar` application
+----
+./mvnw package -Dquarkus.package.type=uber-jar
+----
+
+.Package `native` application
+----
+./mvnw package -Pnative
+----
+
+.Package `native` application without installed GraalVM
+----
+./mvnw package -Pnative -Dquarkus.native.container-build=true
+----
+
+== Technologies
+
+This chapters summarize the integrated technologies and components in the application
+
+|===
+
+| Smallrye OpenAPI | OpenAPI support
+| RESTeasy | REST capability
+| REST Client | Possibility to use REST endpoints
+| Jackson | XML/JSON serialization support for REST endpoints
+| Micrometer | Metric support
+| Micrometer Prometheus | Prometheus adapter for Micrometer
+| OpenTracing | OpenTracing support
+| OpenTelemetry | OpenTelemetry support
+| OpenTelemetry Jaeger | OpenTelemetry and Jaeger adapter
+| Oidc | OIDC support
+| Smallrye Health | Health
+| Kubernetes / OpenShift | Kubernetes and OpenShift support
+| Jib | Docker creation support with Jib
+| Logging Json | JSON support for logging
+| JUnit5 | JUnit
+| RESTassured | REST test framework
+
+|===
+
+=== OpenId Connect and OAuth2
+
+Check the link:https://quarkus.io/guides/security[Quarkus Security Guide] to get a better understanding which extensions exist and when to use which solution.
+
+This example handles the following use cases
+
+* Secure REST endpoints for machine to machine communication
+* Allow only authorized usage (from other systems)
+* Delegate the token while accessing an other backend system
+
+Uses the `oidc` extension to protect the application with *OpenId Connect* extension using the *OpenId Connect Authorization Code Flow*.
+Check `SecuredResource.java` with the `@Authenticated` to indicate that the endpoint is accessible only by a logged in user.
+The relevant Quarkus configurations are
+
+[source,yaml]
+----
+  # ### OpenID Connect  
+  oidc:
+    # use default: service for backend interaction
+    #application-type: web-app
+    
+    auth-server-url: https://auth-server-url
+    client-id: defined-client-id-in-IdP
+    tenant-id: defined-tenant-id-in-IdP
+    credentials:
+      secret: client-secret-value
+    authentication:
+      # redirect path which is registered in the IdP
+      redirect-path: /secured
+      # if redirect and callback URI are different, restore
+      restore-path-after-redirect: true
+
+----
+
+The following secured URLs exist
+
+* link:http://127.0.0.1:8080/secured/date[] without any specific RBAC/role
+* link:http://127.0.0.1:8080/secured/user[] without any specific RBAC/role, calls a remote backend service with a acquired access token
+* link:http://127.0.0.1:8080/secured/dateForManager[] expecting `manager` role
+
+All endpoints are accessible only if a `Bearer Token` exists in the request header. 
+Using `application-type: web-app` would redirect the user/request to the login page of the IdP to verify the authorization of the requestor. The default `application-type: service` will not redirect and deny the request without the Bearer Token.
+
+`OidcClient` (especially `OidcClientFilter`) is used to acquire a new access token for the REST client, check `RemoteUserService.java` with the `@OidcClientFilter` annotation. Details are in the link:https://quarkus.io/guides/security-openid-connect-client#use-oidcclient-in-microprofile-restclient-client-filter[Quarkus OidcClient docu].
+
+Consider, to use the right authorization strategy `service` instead of `web-app`.
+
+
+==== References
+
+* Quarkus Security Guide: link:https://quarkus.io/guides/security-openid-connect[]
+* Quarkus Token Management for remote service access: link:https://quarkus.io/guides/security-openid-connect-client[]
+* Tutorial for Quarkus and OAuth2/OpenId Connect with e.g. IBM Cloud AppId: link:#[]
+
+=== Fault Tolerance
+
+Quarkus also provide an extension for link:https://quarkus.io/guides/smallrye-fault-tolerance[fault tolerance], based on link:https://github.com/smallrye/smallrye-fault-tolerance/[SmallRye Fault Tolerance], the new implementation of the link:https://github.com/eclipse/microprofile-fault-tolerance/[MicroProfile Fault Tolerance Spec]
+
+The implementation supports e.g. `@Retry`, `@Timeout`, `@CircuitBreaker` and `@Fallback`. The later one is used in `RemoteUserService.java` to provide a fallback response in case the endpoint is not reachable.
+
+Even though there is an increasing opinion that this functionality could now be realized with something like like:https://istio.io/[Istio]. Istio offers the possibility to intercept generally (network) failures very well. However, as soon as special business responses/alternatives are to be offered, an application-specific realization - directly in the application, as shown here - cannot be avoided.
+
+==== References
+
+* Quarkus Fault Tolerance: link:https://quarkus.io/guides/smallrye-fault-tolerance[]
+
+== Differentiation Quarkus and JEE/Spec/Other
+
+Quarkus tries to integrate best practices and (JEE) specifications
+
+=== Micrometer and MicroProfile Metrics
+
+tbd
+
+=== OpenTelemetry and OpenTracing
+
+tbd
+
+link:https://opentelemetry.io/[OpenTelemetry] and link:https://opentracing.io/[OpenTracing]
+
+NOTE: Known issue with the combination of OpenTelemetry and REST Client (date 04.07.2021)
+
+== Summary
+
+A playground app handling various modern aspects with Quarkus. 
+
+
+== References
+
+* Quarkus Cookbook: link:https://developers.redhat.com/books/quarkus-cookbook[]
+* Quarkus Security Guide: link:https://quarkus.io/guides/security[]
+
+== Open
+
+N/A
+
+
+== License
+
+This article is licensed under the Apache License, Version 2.
+Separate third-party code objects invoked within this code pattern are licensed by their respective providers pursuant
+to their own separate licenses. Contributions are subject to the
+link:https://developercertificate.org/[Developer Certificate of Origin, Version 1.1] and the
+link:https://www.apache.org/licenses/LICENSE-2.0.txt[Apache License, Version 2].
+
+See also link:https://www.apache.org/foundation/license-faq.html#WhatDoesItMEAN[Apache License FAQ]
+.

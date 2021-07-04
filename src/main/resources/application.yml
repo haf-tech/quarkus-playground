@@ -1,0 +1,47 @@
+# ###########################
+# Configurations
+
+
+greeting:
+  message: "hello"
+
+remote-user-client/mp-rest/url: 'http://127.0.0.1:5000/api/protected'
+remote-user-client/mp-rest/scope: javax.inject.RequestScoped
+
+# ###########################
+quarkus:
+  # ### Container
+  container-image:
+    builder: jib
+
+  # ### OpenID Connect  
+  oidc:
+    #auth-server-url: http://localhost:8180/auth/realms/quarkus
+    #application-type: web-app
+    
+    auth-server-url: http://example.com
+    client-id: 47test
+    tenant-id: 4ctest
+    credentials:
+      secret: Zmtest
+    authentication:
+      # redirect path which is registered in the IdP
+      redirect-path: /secured
+      # if redirect and callback URI are different, restore
+      restore-path-after-redirect: true
+    
+  oidc-client:
+    auth-server-url: https://example2.com
+    client-id: 472test2
+    tenant-id: 4cftest2
+    credentials:
+      secret: ZmZtest2
+
+  # ### Logging
+  log:
+    level: TRACE
+    category:
+      "io.quarkus.oidc.runtime.OidcProvider":
+        level: TRACE
+        min-level: TRACE
+
