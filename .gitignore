@@ -30,7 +30,7 @@ jspm_packages/
 # #### Java
 *.class
 target/*
-.mvn
+#.mvn
 
 # Optional npm cache directory
 .npm
