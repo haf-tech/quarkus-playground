@@ -18,24 +18,27 @@ quarkus:
   oidc:
     #auth-server-url: http://localhost:8180/auth/realms/quarkus
     #application-type: web-app
-    
-    auth-server-url: http://example.com
-    client-id: 47test
-    tenant-id: 4ctest
-    credentials:
-      secret: Zmtest
-    authentication:
+
+    # ##### Set this parameters in the custom application properties or via env vars
+    #auth-server-url: http://example.com
+    #client-id: 47test
+    #tenant-id: 4ctest
+    #credentials:
+    #  secret: Zmtest
+    #authentication:
       # redirect path which is registered in the IdP
-      redirect-path: /secured
+    #  redirect-path: /secured
       # if redirect and callback URI are different, restore
-      restore-path-after-redirect: true
+    #  restore-path-after-redirect: true
     
   oidc-client:
-    auth-server-url: https://example2.com
-    client-id: 472test2
-    tenant-id: 4cftest2
-    credentials:
-      secret: ZmZtest2
+    
+    # ##### Set this parameters in the custom application properties or via env vars
+    #auth-server-url: https://example2.com
+    #client-id: 472test2
+    #tenant-id: 4cftest2
+    #credentials:
+    #  secret: ZmZtest2
 
   # ### Logging
   log:
