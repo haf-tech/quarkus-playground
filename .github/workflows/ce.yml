@@ -1,0 +1,81 @@
+# GitHub Actions
+# Workflow: Using IBM Cloud Code Engine, to build and publish the application
+# Expects the following parameters/secrets
+# - IBMCLOUD_ACCOUNT: the user ID or account Id
+# - IBMCLOUD_APIKEY: API Key
+
+name: CE Build & Deploy
+
+on:
+  push:
+    tags:
+    - ce_deploy
+
+jobs:
+  build-deploy:
+    # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+    runs-on: ubuntu-20.04
+
+    env:
+      REGION: eu-de
+      RESOURCE_GROUP: rg-demo-ce
+      CR_NAMESPACE: demo-ce
+      CE_PROJECT: demo-ce
+      CE_APP_NAME: demo-ce-quarkus
+      # secret holding all env variable values
+      CE_APP_SECRET: demo-ce-quarkus-secret
+
+
+    steps:
+      - name: Install IBM Cloud CLI
+        run: curl -sL https://raw.githubusercontent.com/IBM-Cloud/ibm-cloud-developer-tools/master/linux-installer/idt-installer | bash
+
+      - name: Install IBM Cloud Code Engine CLI plugin
+        run: ibmcloud plugin install code-engine
+
+      - name: Login to IBM Cloud
+        run: ibmcloud login -a https://cloud.ibm.com -c "${{ secrets.IBMCLOUD_ACCOUNT }}" -r "${REGION}" -g "${RESOURCE_GROUP}" --apikey "${{ secrets.IBMCLOUD_APIKEY }}"
+
+      - name: Code Engine - Create/Select Project
+        run: |  
+          echo "Create/Select Project..."                  
+          if ! ibmcloud ce project select -n "${CE_PROJECT}" ; then
+            # Project does not exist, create project and CR namespace and CR push secret
+            ibmcloud cr namespace-add -g "${RESOURCE_GROUP}" "${CR_NAMESPACE}" > /dev/null 2>&1
+
+            ibmcloud ce project create -n "${CE_PROJECT}"
+            ibmcloud ce registry create -n de-icr-io -s de.icr.io -u iamapikey -p "${{ secrets.IBMCLOUD_APIKEY }}"
+          fi
+          echo "...done."
+
+      - name: Code Engine - Create/Update Build
+        run: |
+          echo "Create/Update Build: app=${CE_APP_NAME}"
+          
+          # Update or create the build
+          if ! ibmcloud ce build update -n "${CE_APP_NAME}" --commit "${GITHUB_SHA}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" ; then
+            ibmcloud ce build create -n "${CE_APP_NAME}" --src "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" --commit "${GITHUB_SHA}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" --registry-secret us-icr-io
+          fi
+          echo "...done."
+
+      - name: Code Engine - Submit new BuildRun
+        run: |
+          echo "Create new BuildRun and wait to complete (app=${CE_APP_NAME})..."
+          
+          ibmcloud ce buildrun submit --build "${CE_APP_NAME}" --wait --wait-timeout 600
+          echo "...done."
+
+      - name: Code Engine - Create/Update app
+        run: |
+          echo "Create/Update app=${CE_APP_NAME}..."
+          
+          if ! ibmcloud ce application update -n "${CE_APP_NAME}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" ; then
+            ibmcloud ce application create -n "${CE_APP_NAME}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" \
+              --registry-secret de-icr-io \
+              --env-from-secret "${CE_APP_SECRET}" \
+              --min-scale 1 --max-scale 3 \
+              --cpu 0.25 --memory 0.5G \
+              --concurrency 10 \
+              --port 8080
+          fi
+          echo "...done."
