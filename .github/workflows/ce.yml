@@ -11,21 +11,20 @@ on:
     tags:
     - ce_deploy
 
+env:
+  REGION: eu-de
+  RESOURCE_GROUP: rg-demo-ce
+  CR_NAMESPACE: demo-ce
+  CE_PROJECT: demo-ce
+  CE_APP_NAME: demo-ce-quarkus
+  CE_CR_SECRET_NAME: demo-ce-registry-secret
+  # secret holding all env variable values
+  CE_APP_SECRET: demo-ce-quarkus-secret
+
 jobs:
   build-deploy:
     # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
     runs-on: ubuntu-20.04
-
-    env:
-      REGION: eu-de
-      RESOURCE_GROUP: rg-demo-ce
-      CR_NAMESPACE: demo-ce
-      CE_PROJECT: demo-ce
-      CE_APP_NAME: demo-ce-quarkus
-      CE_CR_SECRET_NAME: demo-ce-registry-secret
-      # secret holding all env variable values
-      CE_APP_SECRET: demo-ce-quarkus-secret
-
 
     steps:
       - name: Prepare - Install IBM Cloud CLI
@@ -55,7 +54,7 @@ jobs:
           echo "Create/Update Build: app=${CE_APP_NAME}"
           
           # Update or create the build
-          if ! ibmcloud ce build update -n "${CE_APP_NAME}" --commit "${GITHUB_SHA}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" ; then
+          if ! ibmcloud ce build update -n "${CE_APP_NAME}" --commit "${GITHUB_SHA}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" --registry-secret "${CE_CR_SECRET_NAME}" --strategy dockerfile --dockerfile src/main/docker/Dockerfile.jvm_multi ; then
             ibmcloud ce build create -n "${CE_APP_NAME}" \
               --src "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" --commit "${GITHUB_SHA}" \
               --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" --registry-secret "${CE_CR_SECRET_NAME}" \
