@@ -22,7 +22,7 @@ jobs:
       CR_NAMESPACE: demo-ce
       CE_PROJECT: demo-ce
       CE_APP_NAME: demo-ce-quarkus
-      CE_CR_SECRET_NAME: de-icr-io
+      CE_CR_SECRET_NAME: demo-ce-registry-secret
       # secret holding all env variable values
       CE_APP_SECRET: demo-ce-quarkus-secret
 
