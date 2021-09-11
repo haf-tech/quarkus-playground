@@ -22,18 +22,19 @@ jobs:
       CR_NAMESPACE: demo-ce
       CE_PROJECT: demo-ce
       CE_APP_NAME: demo-ce-quarkus
+      CE_CR_SECRET_NAME: de-icr-io
       # secret holding all env variable values
       CE_APP_SECRET: demo-ce-quarkus-secret
 
 
     steps:
-      - name: Install IBM Cloud CLI
+      - name: Prepare - Install IBM Cloud CLI
         run: curl -sL https://raw.githubusercontent.com/IBM-Cloud/ibm-cloud-developer-tools/master/linux-installer/idt-installer | bash
 
-      - name: Install IBM Cloud Code Engine CLI plugin
+      - name: Prepare - Install IBM Cloud Code Engine CLI plugin
         run: ibmcloud plugin install code-engine
 
-      - name: Login to IBM Cloud
+      - name: Prepare - Login to IBM Cloud
         #run: ibmcloud login -a https://cloud.ibm.com -c "${{ secrets.IBMCLOUD_ACCOUNT }}" -r "${REGION}" -g "${RESOURCE_GROUP}" --apikey "${{ secrets.IBMCLOUD_APIKEY }}"
         run: ibmcloud login -a https://cloud.ibm.com -r "${REGION}" -g "${RESOURCE_GROUP}" --apikey "${{ secrets.IBMCLOUD_APIKEY }}"
 
@@ -45,7 +46,7 @@ jobs:
             ibmcloud cr namespace-add -g "${RESOURCE_GROUP}" "${CR_NAMESPACE}" > /dev/null 2>&1
 
             ibmcloud ce project create -n "${CE_PROJECT}"
-            ibmcloud ce registry create -n de-icr-io -s de.icr.io -u iamapikey -p "${{ secrets.IBMCLOUD_APIKEY }}"
+            ibmcloud ce registry create -n "${CE_CR_SECRET_NAME}" -s de.icr.io -u iamapikey -p "${{ secrets.IBMCLOUD_APIKEY }}"
           fi
           echo "...done."
 
@@ -55,7 +56,7 @@ jobs:
           
           # Update or create the build
           if ! ibmcloud ce build update -n "${CE_APP_NAME}" --commit "${GITHUB_SHA}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" ; then
-            ibmcloud ce build create -n "${CE_APP_NAME}" --src "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" --commit "${GITHUB_SHA}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" --registry-secret us-icr-io
+            ibmcloud ce build create -n "${CE_APP_NAME}" --src "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" --commit "${GITHUB_SHA}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" --registry-secret "${CE_CR_SECRET_NAME}"
           fi
           echo "...done."
 
@@ -72,7 +73,7 @@ jobs:
           
           if ! ibmcloud ce application update -n "${CE_APP_NAME}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" ; then
             ibmcloud ce application create -n "${CE_APP_NAME}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" \
-              --registry-secret de-icr-io \
+              --registry-secret "${CE_CR_SECRET_NAME}" \
               --env-from-secret "${CE_APP_SECRET}" \
               --min-scale 1 --max-scale 3 \
               --cpu 0.25 --memory 0.5G \
