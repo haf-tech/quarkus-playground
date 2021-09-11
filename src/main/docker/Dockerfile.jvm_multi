@@ -20,8 +20,6 @@
 ###
 
 FROM docker.io/adoptopenjdk/maven-openjdk11 as BUILD
-  
-#USER 1001
 
 COPY src /usr/src/app/src
 COPY ./pom.xml /usr/src/app
