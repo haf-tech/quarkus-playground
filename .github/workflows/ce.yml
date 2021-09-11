@@ -88,7 +88,7 @@ jobs:
         run: |
           echo "Clean BuildRuns for app=${CE_APP_NAME}..."
           
-          # force delete without confirmation
-          ibmcloud ce buildrun delete -f --build "${CE_APP_NAME}"
+          # force delete without confirmation, and ignore if not found
+          ibmcloud ce buildrun delete -f --ignore-not-found --build "${CE_APP_NAME}"
 
           echo "...done."
