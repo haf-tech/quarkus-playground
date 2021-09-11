@@ -21,6 +21,8 @@
 
 FROM docker.io/adoptopenjdk/maven-openjdk11 as BUILD
   
+#USER 1001
+
 COPY src /usr/src/app/src
 COPY ./pom.xml /usr/src/app
 WORKDIR /usr/src/app
@@ -46,17 +48,21 @@ RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
     && chmod 540 /deployments/run-java.sh \
     && echo "securerandom.source=file:/dev/urandom" >> /etc/alternatives/jre/conf/security/java.security
 
-USER 1001
 
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 # We make four distinct layers so if there are application changes the library layers can be re-used
-COPY --from=BUILD --chown=1001 /usr/src/app/target/quarkus-app/lib/ /deployments/lib/
-COPY --from=BUILD --chown=1001 /usr/src/app/target/quarkus-app/*.jar /deployments/
-COPY --from=BUILD --chown=1001 /usr/src/app/target/quarkus-app/app/ /deployments/app/
-COPY --from=BUILD --chown=1001 /usr/src/app/target/quarkus-app/quarkus/ /deployments/quarkus/
+#COPY --from=BUILD --chown=1001 /usr/src/app/target/quarkus-app/lib/ /deployments/lib/
+#COPY --from=BUILD --chown=1001 /usr/src/app/target/quarkus-app/*.jar /deployments/
+#COPY --from=BUILD --chown=1001 /usr/src/app/target/quarkus-app/app/ /deployments/app/
+#COPY --from=BUILD --chown=1001 /usr/src/app/target/quarkus-app/quarkus/ /deployments/quarkus/
+COPY --from=BUILD /usr/src/app/target/quarkus-app/lib/ /deployments/lib/
+COPY --from=BUILD /usr/src/app/target/quarkus-app/*.jar /deployments/
+COPY --from=BUILD /usr/src/app/target/quarkus-app/app/ /deployments/app/
+COPY --from=BUILD /usr/src/app/target/quarkus-app/quarkus/ /deployments/quarkus/
 
 EXPOSE 8080
+USER 1001
 
 ENTRYPOINT [ "/deployments/run-java.sh" ]
 
