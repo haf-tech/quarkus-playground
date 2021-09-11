@@ -56,7 +56,10 @@ jobs:
           
           # Update or create the build
           if ! ibmcloud ce build update -n "${CE_APP_NAME}" --commit "${GITHUB_SHA}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" ; then
-            ibmcloud ce build create -n "${CE_APP_NAME}" --src "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" --commit "${GITHUB_SHA}" --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" --registry-secret "${CE_CR_SECRET_NAME}"
+            ibmcloud ce build create -n "${CE_APP_NAME}" \
+              --src "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" --commit "${GITHUB_SHA}" \
+              --image "de.icr.io/${CR_NAMESPACE}/${CE_APP_NAME}:${GITHUB_SHA}" --registry-secret "${CE_CR_SECRET_NAME}" \
+              --strategy dockerfile --dockerfile src/main/docker/Dockerfile.jvm_multi
           fi
           echo "...done."
 
