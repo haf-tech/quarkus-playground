@@ -34,7 +34,8 @@ jobs:
         run: ibmcloud plugin install code-engine
 
       - name: Login to IBM Cloud
-        run: ibmcloud login -a https://cloud.ibm.com -c "${{ secrets.IBMCLOUD_ACCOUNT }}" -r "${REGION}" -g "${RESOURCE_GROUP}" --apikey "${{ secrets.IBMCLOUD_APIKEY }}"
+        #run: ibmcloud login -a https://cloud.ibm.com -c "${{ secrets.IBMCLOUD_ACCOUNT }}" -r "${REGION}" -g "${RESOURCE_GROUP}" --apikey "${{ secrets.IBMCLOUD_APIKEY }}"
+        run: ibmcloud login -a https://cloud.ibm.com -r "${REGION}" -g "${RESOURCE_GROUP}" --apikey "${{ secrets.IBMCLOUD_APIKEY }}"
 
       - name: Code Engine - Create/Select Project
         run: |  
