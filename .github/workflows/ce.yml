@@ -83,3 +83,15 @@ jobs:
               --port 8080
           fi
           echo "...done."
+
+  clean-up:
+    runs-on: ubuntu-20.04
+    needs: [build-deploy]
+    steps:
+      - name: Code Engine - Clean BuildRuns
+        run: |
+          echo "Clean BuildRuns for app=${CE_APP_NAME}..."
+          
+          ibmcloud ce buildrun delete --build "${CE_APP_NAME}"
+
+          echo "...done."
