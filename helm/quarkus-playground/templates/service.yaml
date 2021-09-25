@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "quarkus-playground.fullname" . }}-svc
+  labels:
+    {{- include "quarkus-playground.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "quarkus-playground.selectorLabels" . | nindent 4 }}
