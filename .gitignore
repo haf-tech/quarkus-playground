@@ -37,6 +37,7 @@ target/*
 
 # internal files
 internal.*
+work
 vcap.local.json
 .DS_Store
 
