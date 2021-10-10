@@ -1,0 +1,17 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  creationTimestamp: null
+  name: quarkus-playground-tekton-binding
+  #namespace: tekton101-cicd
+spec:
+  params:
+  - name: imageRepo
+    value: image-registry.openshift-image-registry.svc:5000/tekton101-cicd/tekton-101
+  - name: imageTag
+    value: $(extensions.imgTag)
+  - name: tlsVerify
+    value: "false"
+  - name: dockerFile
+    value: "./src/main/docker/Dockerfile.jvm"
+status: {}

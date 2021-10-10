@@ -82,6 +82,26 @@ export QUARKUS_OIDC_CLIENT_CREDENTIALS_SECRET="client-secret-value"
 ./mvnw package -Pnative -Dquarkus.native.container-build=true
 ----
 
+.Package and push container using Dockerfile
+----
+podman build -f src/main/docker/Dockerfile.jvm_multi -t quarkus-playground:jvm-v2 .
+
+podman login -u $(oc whoami) -p $(oc whoami -t) image-registry.example.com
+Login Succeeded!
+
+podman tag quarkus-playground:jvm-v2 image-registry.example.com/test/quarkus-playground:jvm-v2
+
+podman push image-registry.example.com/test/quarkus-playground:jvm-v2
+----
+
+.Generate Kubernetes/OpenShift resources from helm but execute directly
+----
+cd helm
+helm3 template rel1 quarkus-playground -f quarkus-playground/values.test.yaml --output-dir=work
+
+oc apply -f work/quarkus-playground/templates/
+----
+
 == Technologies
 
 This chapters summarize the integrated technologies and components in the application
@@ -188,6 +208,406 @@ tbd
 link:https://opentelemetry.io/[OpenTelemetry] and link:https://opentracing.io/[OpenTracing]
 
 NOTE: Known issue with the combination of OpenTelemetry and REST Client (date 04.07.2021)
+
+== Runtimes
+
+This chapter covers the various deployment runtimes and the related deployment mechanisms.
+
+=== Locally
+
+To create and run the container locally use one of the provided `Dockerfile` in the `src/main/docker` directory. The multistage Dockerfile `src/main/docker/Dockerfile.jvm_multi` includes also the Quarkus build and package steps.
+
+.Build image
+----
+podman build -f src/main/docker/Dockerfile.jvm_multi -t quarkus-playground:jvm-v1 .
+
+...
+INFO] Checking for existing resources in: /usr/src/app/src/main/kubernetes.
+[INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 7537ms
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:13 min
+[INFO] Finished at: 2021-09-05T19:46:30Z
+[INFO] ------------------------------------------------------------------------
+--> f0f9faa678e
+[2/2] STEP 1/13: FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
+Trying to pull registry.access.redhat.com/ubi8/ubi-minimal:8.4...
+Getting image source signatures
+...
+[2/2] STEP 11/13: EXPOSE 8080
+--> 1fa8630cb6c
+[2/2] STEP 12/13: USER 1001
+--> f6b0f637dde
+[2/2] STEP 13/13: ENTRYPOINT [ "/deployments/run-java.sh" ]
+[2/2] COMMIT quarkus-playground:jvm-v1
+--> 4c87559e774
+Successfully tagged localhost/quarkus-playground:jvm-v1
+4c87559e77453ae8300f03f63b35a0469ef867e6849dc489215195c2f5bd8f1c
+
+----
+
+.Run image
+----
+podman run --rm -P --name tekton-test4 --env-file internal.env.txt quarkus-playground:jvm-v1
+----
+
+the `internal.env.txt` contains all the env variables as key-value pairs, see the following example
+
+----
+QUARKUS_OIDC_AUTH_SERVER_URL=https://oidc.example.com
+QUARKUS_OIDC_CLIENT_ID=472fee89-...
+QUARKUS_OIDC_CREDENTIALS_SECRET=ZmZhM...
+QUARKUS_OIDC_CLIENT_AUTH_SERVER_URL=https://oidc.example.com
+QUARKUS_OIDC_CLIENT_CLIENT_ID=472fee8...
+QUARKUS_OIDC_CLIENT_CREDENTIALS_SECRET=ZmZhMzE....
+----
+
+NOTE: For local execution is this totally fine. On remote environments consider to secure the secrets and sensitive data
+
+=== Helm
+
+link:https://helm.sh/docs/[Helm] is one of the most popular and widespread deployment and template solution of Kubernetes applications.
+The link:helm[] directory contains the Helm chart, generated with Helm3 and adapted the following requirements
+
+* Extract various configuration parameters into value files (health endpoints, container port, env from config or secret if available)
+* Add more Kubernetes labels to the generated resources (see `_helpers.tpl`) and add the labels also to the generated PODs
+* use `image.tag` for versioning and not `Chart.appVersion`
+* provide various value files, representing various stages (like dev, test, prod)
+
+.Install/Upgrade via Helm3
+----
+$ helm3 upgrade --install quarkus-test helm/quarkus-playground -f helm/quarkus-playground/values.test.yaml
+
+Release "quarkus-test" does not exist. Installing it now.
+NAME: quarkus-test
+LAST DEPLOYED: Sat Sep 25 12:28:41 2021
+NAMESPACE: test
+STATUS: deployed
+REVISION: 1
+NOTES:
+
+$ helm3 list
+NAME        	NAMESPACE	REVISION	UPDATED                              	STATUS  	CHART                   	APP VERSION
+quarkus-test	test     	1       	2021-09-25 12:28:41.249726 +0200 CEST	deployed	quarkus-playground-0.1.0
+
+$ helm3 history quarkus-test
+REVISION	UPDATED                 	STATUS  	CHART                   	APP VERSION	DESCRIPTION
+1       	Sat Sep 25 12:28:41 2021	deployed	quarkus-playground-0.1.0	           	Install complete
+
+$ helm3 delete quarkus-test
+release "quarkus-test" uninstalled
+----
+
+In case the installation via Helm is not wanted use Helm to generate the resource files and apply them directly
+
+----
+$ helm3 template quarkus-test helm/quarkus-playground -f helm/quarkus-playground/values.test.yaml --output-dir=work
+wrote work/quarkus-playground/templates/serviceaccount.yaml
+wrote work/quarkus-playground/templates/service.yaml
+wrote work/quarkus-playground/templates/deployment.yaml
+
+$ oc apply -f helm/work/quarkus-playground/templates
+----
+
+=== Source2Image
+
+link:https://github.com/openshift/source-to-image[Source-To-Image (S2I)] is a solution to determine the right toolkit to build, test, package and deploy an application from the given source code. Based on this analysis a specific builder will be used to proceed the workflow, like a builder for nodejs or Java application.
+S2I is primarily used in OpenShift, but similar concepts and solutions are also available and named link:https://buildpacks.io/[Cloud Native Buildpacks]. Based on this concept and solutions, a new project link:https://github.com/shipwright-io/build[shipwright] is formed trying to simplifies the container build with various integration, also Buildpacks, BuildKit etc.
+
+This section covers however S2I to build, package and deploy this Quarkus application from the source code. 
+S2I needs some configuration to find the right artifacts and prepare the build, such config parameters are defined in link:.s2i/environment[].
+
+Various S2I builder are available to build the application, the following could be used due they support the minimum JDK version that we need for the source code
+
+* Plain Java with link:registry.access.redhat.com/ubi8/openjdk-11[openjdk-11]
+* Native executable with GraalVM link:quay.io/quarkus/ubi-quarkus-native-s2i:20.3.3-java11[ubi-quarkus-native-s2i]. Consider that this approach takes more time to create the native image
+
+.Commands for deploying app (incl. exposing route)
+----
+oc new-app registry.access.redhat.com/ubi8/openjdk-11~https://github.com/haf-tech/quarkus-playground.git --context-dir=. --name=quarkus-playground-s2i --env-file=internal.env.txt
+----
+
+
+.Commands for deploying app with native image (incl. exposing route)
+----
+oc new-app quay.io/quarkus/ubi-quarkus-native-s2i:20.3.3-java11~https://github.com/haf-tech/quarkus-playground.git --context-dir=. --name=quarkus-playground-s2i --env-file=internal.env.txt
+----
+
+.General commands to expose service
+----
+oc get pods
+NAME                                      READY   STATUS      RESTARTS   AGE
+quarkus-playground-s2i-1-build            0/1     Completed   0          12m
+quarkus-playground-s2i-68b9459d55-ljwqs   1/1     Running     0          6m8s
+
+oc get svc
+NAME                     TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+quarkus-playground-s2i   ClusterIP   172.21.209.63   <none>        8080/TCP   13m
+
+oc expose svc quarkus-playground-s2i
+----
+
+.To delete all generated resources
+----
+oc delete all -l app=quarkus-playground-s2i
+----
+
+Some drawbacks, not only for S2I, but for all similar toolkits, the lack of automated/integrated configuration and adjustments of the resulting state. E.g. adjustments for ConfigMaps, Routes, Labels etc are limited and needs additional steps _after_ deployment.
+Also in complex or enterprise related CI/CD pipelines, where more steps are mandatory like test execution, static and dynamic source scan etc. could not be applied with S2I. In such cases, is it advisable to compact workflow for build, package and deploy in separate steps.
+Nevertheless S2I is a great feature for fast ramp up and enforce a unified way in deployments.
+
+
+.References
+* Quarkus: link:https://quarkus.pro/guides/deploying-to-openshift-s2i.html[Deploying with S2I]
+
+=== Tekton Pipeline
+
+link:https://tekton.dev/[Tekton] is a framework to create flexible kubernetes-native CI/CD pipelines. The framework is very generic and a hugh set of link:https://hub.tekton.dev/[Tekton Tasks] exists which can be used and integrated in the own custom pipeline.
+
+CI/CD on Tekton is a complex topic, and mostly should be also covered with GitOps principles. An example with scripts are available in an own link:https://github.com/k8s-universe/tekton-101-gitops[repo (tekton-101-gitops)].
+This chapter focus primarily only on Tekton. The related scripts are in the link:.tekton[] directory and are extracted from the `cicd` part of the link:https://github.com/k8s-universe/tekton-101-gitops/tree/main/config/cicd[tekton-101-gitops] repo.
+
+The pipeline is separated in CI and CD pipelines, building the app and push to the registry and deploy via helm.
+
+.Init Tekton pipeline and configuration
+----
+oc apply -k .tekton/cicd/overlays/
+
+serviceaccount/pipeline configured
+clusterrole.rbac.authorization.k8s.io/pipelines-clusterrole configured
+rolebinding.rbac.authorization.k8s.io/internal-registry-cicd-binding configured
+clusterrolebinding.rbac.authorization.k8s.io/pipelines-privileged-role-binding configured
+clusterrolebinding.rbac.authorization.k8s.io/pipelines-service-role-binding configured
+route.route.openshift.io/gitops-webhook-event-listener-route configured
+pipeline.tekton.dev/cd-pipeline-helm unchanged
+pipeline.tekton.dev/ci-dryrun-from-push-pipeline unchanged
+pipeline.tekton.dev/ci-pipeline-maven-buildah unchanged
+task.tekton.dev/buildah-v0-22-0-privileged unchanged
+task.tekton.dev/deploy-from-source-task unchanged
+task.tekton.dev/kaniko-v0-5-1 configured
+task.tekton.dev/maven-v0-2-1 unchanged
+eventlistener.triggers.tekton.dev/cicd-event-listener-quarkus-playground created
+triggerbinding.triggers.tekton.dev/github-push-binding configured
+triggerbinding.triggers.tekton.dev/quarkus-playground-tekton-binding configured
+triggertemplate.triggers.tekton.dev/ci-dryrun-from-push-template configured
+----
+
+This installs various configurations like service account, role bindings, tasks for build app with maven, package with buildah and deployment with helm. The following tasks are optimized
+
+* `maven`: enhancing the GOALS parameter handling and introduce workspace usage for the maven libs
+* `buildah`: re-adding the `securityContext.privileged: true` feature
+
+For `kaniko` (even this is option is not used in the pipeline)
+
+* `SSL_CERT_DIR` overwrite the env variable to `/etc/config-registry-cert` (see the Tekton link:https://github.com/tektoncd/operator/pull/246/commits/752a254b1893f777fb90ced24d66258af3b7bca8#[change])
+* disable tls and secured registry verification, due only the internal registry is used
+
+Additionally two pipelines are created for CI `ci-pipeline-maven-buildah` and for CD `cd-pipeline-helm`. Also Trigger Template and Event Listener created. The following figures give an overview of the pipeline tasks and steps.
+
+.CI Pipeline to build and push app
+image:static/tekton-ci-pipeline-maven-buildah.png[]
+
+.CD Pipeline to deploy app
+image:static/tekton-cd-pipeline-helm.png[]
+
+Following the commands to execute the pipelines manually.
+
+----
+oc apply -f .tekton/runs/pipelinerun-maven.yaml
+
+oc apply -f .tekton/runs/pipelinerun-deploy.yaml
+----
+
+This is a very basic Tekton pipeline to build, package and deploy an application, separating the pipeline flow in two separate pipelines for CI and CD. Generally every git commit should trigger the CI pipeline. And depending of the deployment approach and stage, the version will be automatically deployed to a temp/test stage or the CD pipeline will be triggert by an additional event like a merged pull request (to a dedicated git branch).
+The handling, which pipeline should be triggered can be configured in the `EventListener`.
+
+==== Troubleshooting
+
+.`buildah` and RHEL user namespace
+----
+Error during unshare(CLONE_NEWUSER): Invalid argument
+User namespaces are not enabled in /proc/sys/user/max_user_namespaces.
+ERRO error parsing PID "": strconv.Atoi: parsing "": invalid syntax  
+ERRO (unable to determine exit status)
+----
+
+See link:https://access.redhat.com/solutions/6232211[] which holds the info, that on RHEL compute nodes the user namespace should be enabled.
+Alternative is to use `kaniko` or set the scc `privileged` to the service account `pipeline` and set `securityContext.privileged: true` to the task execution.
+
+
+=== IBM Cloud Code Engine
+
+link:https://cloud.ibm.com/docs/codeengine[IBM Cloud Code Engine] is the serverless offering of IBM Cloud and provides the overall environment and tools to publish the source code into a managed Kubernetes environment. 
+This sub chapter covers the main steps to run the same Quarkus application in a serverless offering (here: IBM Cloud Code Engine). A detailed instruction is in the link:https://my.center-of.info/quarkus-and-ibm-cloud-code-engine[blog post]
+
+* use IBM Cloud Code Engine
+** Set some constraints like region `-r` and resource group `-g`
+** create a Code Engine (ce) project (here: `demo-ce`)
+** create API Key to use for Container Registry access (see link:https://cloud.ibm.com/docs/codeengine?topic=codeengine-deploy-app-crimage#deploy-app-crimage-cli[docu])
+** create registry secret
+** create a build config named `demo-ce-quarkus-build` using cloud native buildpacks
+** create a build run from the build config
+
+.Instruction to configure, build and run the app
+[%collapsible]
+====
+----
+# Set region and a custom resource group 
+ibmcloud target -r eu-de
+ibmcloud target -g rg-demo-ce
+
+# #### Code Engine specific
+# Create a project
+ibmcloud ce project create --name demo-ce
+Creating project 'demo-ce'...
+ID for project 'demo-ce' is '47459f93-6284-4dde-b473-de6ce9720a62'.
+Waiting for project 'demo-ce' to be active...
+Now selecting project 'demo-ce'.
+OK
+
+# ...or select an existing project
+ibmcloud ce project select -n demo-ce
+Selecting project 'demo-ce'...
+OK
+
+# Create API Key which will be used for working with container registry
+ibmcloud iam api-key-create own-api-key -d "Demo CE API Key" --file key_file
+
+# Create a registry secret to push the generated images in
+ibmcloud ce registry create --name demo-ce-registry-secret --server de.icr.io --username iamapikey
+
+# Create a build configuration using Buildpacks (not available for Quarkus yet)
+ibmcloud ce build create --name demo-ce-quarkus-build --image de.icr.io/demo-ce/quarkus-playground:latest --registry-secret demo-ce-registry-secret --source https://github.com/haf-tech/quarkus-playground --strategy buildpacks
+
+# Create a build configuration using Dockerfile
+ibmcloud ce build create --name demo-ce-quarkus-build --image de.icr.io/demo-ce/quarkus-playground:latest --registry-secret demo-ce-registry-secret --source https://github.com/haf-tech/quarkus-playground --strategy dockerfile --dockerfile src/main/docker/Dockerfile.jvm_multi
+
+
+
+# Check build config and details
+ibmcloud ce build list
+Listing builds...
+OK
+
+Name                   Status     Reason                     Image                                        Build Strategy        Age   Last Build Run Name  Last Build Run Age  
+demo-ce-quarkus-build  Succeeded  all validations succeeded  de.icr.io/demo-ce/quarkus-playground:latest  buildpacks-v3-medium  4m6s 
+
+ibmcloud ce build get --name demo-ce-quarkus-build
+Getting build 'demo-ce-quarkus-build'
+OK
+
+Name:          demo-ce-quarkus-build  
+ID:            ded1cb12-d4b6-4713-a743-29de679472de  
+Project Name:  demo-ce  
+Project ID:    1ae76b8e-1750-4b1a-8ad8-df0e1c5301ed  
+Age:           4m23s  
+Created:       2021-09-05T17:30:23Z  
+Status:        Succeeded  
+Reason:        all validations succeeded  
+
+Image:            de.icr.io/demo-ce/quarkus-playground:latest  
+Registry Secret:  demo-ce-registry-secret  
+Build Strategy:   buildpacks-v3-medium  
+Timeout:          10m0s  
+Source:           https://github.com/haf-tech/quarkus-playground  
+Commit:           main  
+Dockerfile:      
+
+# Create a build run from the build configuration
+ibmcloud ce buildrun submit --build demo-ce-quarkus-build 
+
+
+# Details of build run
+ibmcloud ce buildrun list
+Listing build runs...
+OK
+
+Name                                       Status  Image                                        Build Name             Age  
+demo-ce-quarkus-build-run-210905-17420916  Failed  de.icr.io/demo-ce/quarkus-playground:latest  demo-ce-quarkus-build  42s  
+ibmcloud ce buildrun get --name demo-ce-quarkus-build-run-210905-17420916
+Getting build run 'demo-ce-quarkus-build-run-210905-17420916'...
+OK
+
+Name:          demo-ce-quarkus-build-run-210905-17420916  
+ID:            e84ce96f-481a-4fa3-b3ed-818106578586  
+Project Name:  demo-ce  
+Project ID:    1ae76b8e-1750-4b1a-8ad8-df0e1c5301ed  
+Age:           100s  
+Created:       2021-09-05T17:42:09Z  
+
+Summary:  Failed to execute build run  
+Status:   Failed  
+Reason:   BuildRun failed to build and push the container image, for detailed information: 'ibmcloud ce buildrun logs -n demo-ce-quarkus-build-run-210905-17420916', for troubleshooting information visit: https://cloud.ibm.com/docs/codeengine?topic=codeengine-troubleshoot-build#ts-build-bldpush-stepfail  
+
+Image:  de.icr.io/demo-ce/quarkus-playground:latest  
+
+# ...see if status is Succeeded
+ibmcloud ce buildrun list
+Listing build runs...
+OK
+
+Name                                        Status     Image                                        Build Name             Age  
+demo-ce-quarkus-build-run-210905-17420916   Failed     de.icr.io/demo-ce/quarkus-playground:latest  demo-ce-quarkus-build  50m  
+demo-ce-quarkus-build-run-210905-182716641  Succeeded  de.icr.io/demo-ce/quarkus-playground:latest  demo-ce-quarkus-build  4m57s 
+
+# ...again details of the build run
+ibmcloud ce buildrun get --name demo-ce-quarkus-build-run-210905-182716641
+Getting build run 'demo-ce-quarkus-build-run-210905-182716641'...
+OK
+
+Name:          demo-ce-quarkus-build-run-210905-182716641  
+ID:            180042fd-7db1-4a34-b4f1-b809f1f7e414  
+Project Name:  demo-ce  
+Project ID:    1ae76b8e-1750-4b1a-8ad8-df0e1c5301ed  
+Age:           5m47s  
+Created:       2021-09-05T18:27:16Z  
+
+Summary:  Succeeded  
+Status:   Succeeded  
+Reason:   All Steps have completed executing  
+
+Image:  de.icr.io/demo-ce/quarkus-playground:latest  
+
+# Create a secret with the relevant configuration which will be injected as env variables to the app
+vi secrets_multi.txt
+ibmcloud ce secret create --name demo-ce-quarkus-secret --from-env-file secrets_multi.txt
+Creating generic secret 'demo-ce-quarkus-secret'...
+OK
+
+# Create an app from the image
+ibmcloud ce application create --name demo-ce-quarkus \
+  --image de.icr.io/demo-ce/quarkus-playground:latest --registry-secret demo-ce-registry-secret \
+  --min-scale 1 --max-scale 3 \
+  --cpu 0.25 --memory 0.5G \
+  --concurrency 10 \
+  --port 8080 \
+  --env-from-secret demo-ce-quarkus-secret
+
+Creating application 'demo-ce-quarkus'...
+The Route is still working to reflect the latest desired specification.
+Configuration 'demo-ce-quarkus' is waiting for a Revision to become ready.
+Ingress has not yet been reconciled.
+Waiting for load balancer to be ready.
+Run 'ibmcloud ce application get -n demo-ce-quarkus' to check the application status.
+OK
+
+https://demo-ce-quarkus.e19mnwb24sf.eu-de.codeengine.appdomain.cloud
+
+----
+====
+
+
+.Further helpful commands
+* Delete app: `ibmcloud ce app delete -n demo-ce-quarkus`
+* Delete all build runs to a build: `ibmcloud ce buildrun delete --build demo-ce-quarkus-build`
+* Delete build configuration: `ibmcloud ce build delete -n demo-ce-quarkus-build`
+
+
+.References
+* IBM Cloud Code Engine - link:https://cloud.ibm.com/docs/codeengine[Getting Started]
+* IBM Cloud Code Engine - link:https://github.com/IBM/CodeEngine[GitHub: Examples]
+* IBM Cloud Code Engine - link:https://cloud.ibm.com/docs/codeengine?topic=codeengine-mem-cpu-combo[CPU-Memory Combo]
 
 == Summary
 

@@ -1,0 +1,50 @@
+# PipelineRun example to execute Pipeline "maven-ci-pipeline"
+# to build and package Quarkus app‚
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: quarkus-deploy-pr
+  generateName: quarkus-run-
+spec:
+  params:
+    - name: REPO
+      value: "quarkus-playground"
+    - name: GIT_REPO
+      value: "https://github.com/haf-tech/quarkus-playground"
+    - name: TLSVERIFY
+      value: "false"
+    - name: IMAGE
+      value: "image-registry.openshift-image-registry.svc:5000/test/quarkus-playground-tekton:latest"
+    - name: GIT_REF
+      value: "main"
+    - name: HELM_CHART_DIR
+      value: "helm/quarkus-playground"
+    - name: HELM_RELEASE_VERSION
+      value: "v0.5.0"
+    - name: HELM_RELEASE_NAME
+      value: "quarkus-playground-tkn-test"
+    - name: HELM_RELEASE_NAMESPACE
+      value: "test"
+    - name: HELM_VALUES_FILE
+      value: "values.test.yaml"
+    - name: HELM_OVERWRITE_VALUES
+      value: "image.repository=image-registry.openshift-image-registry.svc:5000/test/quarkus-playground-tekton,image.tag=latest"
+  pipelineRef:
+    name: cd-pipeline-helm
+  serviceAccountName: pipeline
+  workspaces:
+  - name: shared-data
+    persistentVolumeClaim:
+      claimName: pipeline-repo-pvc
+#  - name: shared-data
+#    volumeClaimTemplate:
+#      metadata:
+#        creationTimestamp: null
+#      spec:
+#        accessModes:
+#        - ReadWriteOnce
+#        resources:
+#          requests:
+#            storage: 1Gi
+#      status: {}
+  

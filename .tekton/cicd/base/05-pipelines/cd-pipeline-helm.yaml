@@ -1,0 +1,63 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  creationTimestamp: null
+  name: cd-pipeline-helm
+  #namespace: tekton101-cicd
+spec:
+  params:
+  - name: GIT_REPO
+    type: string
+  - name: GIT_REF
+    type: string
+  - name: HELM_CHART_DIR
+    type: string
+  - name: HELM_RELEASE_VERSION
+    type: string
+  - name: HELM_RELEASE_NAME
+    type: string
+  - name: HELM_RELEASE_NAMESPACE
+    type: string
+  - name: HELM_VALUES_FILE
+    type: string
+  - name: HELM_OVERWRITE_VALUES
+    type: string
+  tasks:
+  - name: clone-source
+    params:
+    - name: url
+      value: $(params.GIT_REPO)
+    - name: revision
+      value: $(params.GIT_REF)
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+  - name: deploy-app
+    params:
+    - name: charts_dir
+      value: $(params.HELM_CHART_DIR)
+    - name: release_version
+      value: $(params.HELM_RELEASE_VERSION)
+    - name: release_namespace
+      value: $(params.HELM_RELEASE_NAMESPACE)
+    - name: release_name
+      value: $(params.HELM_RELEASE_NAME)
+    - name: values_file
+      value: $(params.HELM_VALUES_FILE)
+    - name: overwrite_values
+      value: $(params.HELM_OVERWRITE_VALUES)
+    runAfter:
+    - clone-source
+    taskRef:
+      kind: ClusterTask
+      name: helm-upgrade-from-source
+    workspaces:
+    - name: source
+      workspace: shared-data
+  workspaces:
+  - description: This workspace will receive the cloned git repo.
+    name: shared-data
+  
