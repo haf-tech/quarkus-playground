@@ -34,6 +34,8 @@ Do not use this application as entire reference for final productive system, but
 | Secured API without role | link:http://127.0.0.1:8080/secured/date[]
 | Secured API with role | link:http://127.0.0.1:8080/secured/dateForManager[]
 | Secured API with Backend call | link:http://127.0.0.1:8080/secured/user[]
+| | 
+| Kafka Topic SSE | link:http://127.0.0.1:8080/v1/importantevents[]
 |===
 
 == Usage
@@ -192,6 +194,66 @@ Even though there is an increasing opinion that this functionality could now be 
 ==== References
 
 * Quarkus Fault Tolerance: link:https://quarkus.io/guides/smallrye-fault-tolerance[]
+
+=== Messaging with Kafka
+
+Messaging contains the aspect to interact between provider and consumer mostly in an asynchronous way. Therefor the provider exposes messages in any kind of format directly to a consumer (point-2-point) or to a broader audience (fan-out or pub/sub).
+For the latter case is link:https://kafka.apache.org/[Apache Kafka] a technical solution.
+Quarkus provides also an link:https://quarkus.io/guides/kafka[extension] to integrate and interact with Kafka.
+
+.extension for pom.xml
+[source,xml]
+----
+
+		<dependency>
+		    <groupId>io.quarkus</groupId>
+		    <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+		</dependency>
+----
+
+with the following configuration to subscribe a topic
+
+[source,yaml]
+----
+
+# Messaging / Kafka
+kafka.bootstrap.servers: localhost:9092
+mp.messaging.incoming.importantevents.connector: smallrye-kafka
+mp.messaging.incoming.importantevents.value.deserializer: org.apache.kafka.common.serialization.StringDeserializer    
+----
+
+
+and the following Java fragment to consume messages from a topic
+
+[source,java]
+----
+  @Incoming("importantevents")
+	public void consume(ConsumerRecord<String, ?> record) {
+
+		// Can be `null` if the incoming record has no key
+		String key = record.key();
+		Object value = record.value();
+		String topic = record.topic();
+		int partition = record.partition();
+		// ...
+
+		LOG.debugf("consume(): topic: %s, key: %s, partition: %d", topic, key, partition);
+		LOG.infof("consume(): value=%s", value);
+	}
+----
+
+In case the event is in the Cloud Event structure it will be link:https://quarkus.io/blog/kafka-cloud-events/[automatically parsed] and the message will have additional meta data attributes.
+
+.Call endpoint to retrieve next message/event
+----
+curl -N http://127.0.0.1:8080/v1/importantevents
+{"id":"name:pg-test-ce;lsn:654316360;txId:540","source":"/debezium/postgresql/pg-test-ce","specversion":"1.0","type":"io.debezium.postgresql.datachangeevent","time":"2021-10-24T18:50:04.046Z","datacontenttype":"application/json","iodebeziumop":"c","iodebeziumversion":"1.7.0.Final","iodebeziumconnector":"postgresql","iodebeziumname":"pg-test-ce","iodebeziumtsms":"1635101404046","iodebeziumsnapshot":"false","iodebeziumdb":"ibmclouddb","iodebeziumsequence":"[\"654314576\",\"654316360\"]","iodebeziumschema":"public","iodebeziumtable":"importantevents","iodebeziumtxId":"540","iodebeziumlsn":"654316360","iodebeziumxmin":null,"iodebeziumtxid":null,"iodebeziumtxtotalorder":null,"iodebeziumtxdatacollectionorder":null,"data":{"schema":{"type":"struct","fields":[{"type":"struct","fields":[{"type":"int32","optional":false,"default":0,"field":"id"},{"type":"string","optional":false,"field":"title"},{"type":"string","optional":false,"field":"event_state"},{"type":"int64","optional":true,"name":"io.debezium.time.MicroTimestamp","version":1,"field":"created_at"}],"optional":true,"name":"pg_test_ce.public.importantevents.Value","field":"before"},{"type":"struct","fields":[{"type":"int32","optional":false,"default":0,"field":"id"},{"type":"string","optional":false,"field":"title"},{"type":"string","optional":false,"field":"event_state"},{"type":"int64","optional":true,"name":"io.debezium.time.MicroTimestamp","version":1,"field":"created_at"}],"optional":true,"name":"pg_test_ce.public.importantevents.Value","field":"after"}],"optional":false,"name":"io.debezium.connector.mysql.Data"},"payload":{"before":null,"after":{"id":34,"title":"event1","event_state":"1","created_at":1635108604046093}}}}
+----
+
+==== References
+
+* Quarkus Kafka Reference Guide: link:https://quarkus.io/guides/kafka[]
+* Quarkus Kafka Cloud Events: link:https://quarkus.io/blog/kafka-cloud-events/[]
 
 == Differentiation Quarkus and JEE/Spec/Other
 

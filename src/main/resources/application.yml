@@ -48,3 +48,6 @@ quarkus:
         level: TRACE
         min-level: TRACE
 
+# default String deserializer, internally Cloud Event structure will be recognized and parsed
+mp.messaging.incoming.importantevents.value.deserializer: org.apache.kafka.common.serialization.StringDeserializer    
+
