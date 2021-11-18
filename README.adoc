@@ -36,6 +36,8 @@ Do not use this application as entire reference for final productive system, but
 | Secured API with Backend call | link:http://127.0.0.1:8080/secured/user[]
 | | 
 | Kafka Topic SSE | link:http://127.0.0.1:8080/v1/importantevents[]
+| | 
+| Simple Echo endpoint | link:http://127.0.0.1:8080/v1/mirror/?e=TestMessage[]
 |===
 
 == Usage
