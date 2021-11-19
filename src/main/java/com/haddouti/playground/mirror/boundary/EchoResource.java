@@ -7,6 +7,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import org.jboss.resteasy.annotations.jaxrs.QueryParam;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
@@ -18,12 +20,17 @@ public class EchoResource {
 
 	private static final Logger LOG = Logger.getLogger(EchoResource.class);
 
+	static DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+
 	@Path("")
 	@GET
 	@NoCache
 	public String echo(@QueryParam("e") String txt) {
 		LOG.info("echo()");
 		
+		LocalDateTime currentDateTime = LocalDateTime.now();
+		String formattedDateTime = currentDateTime.format(formatter);
+		//return String.format("Echo <%s>: %s", formattedDateTime, txt);
 		return "Echo: " + txt;
 	}
 
