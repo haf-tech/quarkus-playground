@@ -510,8 +510,15 @@ This sub chapter covers the main steps to run the same Quarkus application in a 
 ** create a Code Engine (ce) project (here: `demo-ce`)
 ** create API Key to use for Container Registry access (see link:https://cloud.ibm.com/docs/codeengine?topic=codeengine-deploy-app-crimage#deploy-app-crimage-cli[docu])
 ** create registry secret
-** create a build config named `demo-ce-quarkus-build` using cloud native buildpacks
-** create a build run from the build config
+** create a build config named `demo-ce-quarkus-build` using cloud native buildpacks / existing Dockerfile
+** create a build run from the build config to create a container image
+** create an application from the built container image
+
+The <<fig1>> symbolize the main workflow to deploy an application from source code.
+
+[[fig1, Figure 1]]
+image:static/quarkus-ibm-cloud-code-engine.png[]
+
 
 .Instruction to configure, build and run the app
 [%collapsible]
