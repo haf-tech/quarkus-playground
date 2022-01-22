@@ -16,6 +16,10 @@ quarkus:
 
   # ### OpenID Connect  
   oidc:
+#    authentication:
+#      user-info-required: true
+#      scopes: openid
+
     #auth-server-url: http://localhost:8180/auth/realms/quarkus
     #application-type: web-app
 

@@ -16,6 +16,7 @@ import org.jboss.logging.Logger;
 
 import com.haddouti.playground.user.boundary.UserResource;
 
+import io.quarkus.oidc.UserInfo;
 import io.quarkus.security.Authenticated;
 import io.quarkus.security.identity.SecurityIdentity;
 
@@ -42,6 +43,9 @@ public class SecuredResource {
 	@Inject
 	UserResource userService;
 
+	@Inject
+    UserInfo userInfo;
+
 	@GET
 	@Path("date")
 	@Consumes({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
@@ -51,7 +55,13 @@ public class SecuredResource {
 		LOG.debugf("getDate(): isSecure: %s, authSchema: %s", sc.isSecure(), sc.getAuthenticationScheme());
 		LOG.infof("getDate(): principle.name=%s, allAttributes=%s", securityIdentity.getPrincipal().getName(),
 				securityIdentity.getAttributes());
+		LOG.infof("getDate(): securityIdentity.userInfo=%s", securityIdentity.getAttribute("userinfo"));
 		LOG.debugf("getDate(): jwt.accessToken=%s", accessToken);
+		LOG.debugf("getDate(): jwt.accessToken.name=%s, jwt.accessToken.claim('name')=%s", accessToken.getName(), accessToken.getClaim("name"));
+
+		JsonWebToken jwt = (JsonWebToken) securityIdentity.getPrincipal();
+		LOG.debugf("getDate(): jwt.name=%s, jwt.claim('name')=%s", jwt.getName(), jwt.getClaim("name"));
+		LOG.debugf("getDate(): userInfo=%s", userInfo);
 
 		return LocalDate.now().toString();
 	}
