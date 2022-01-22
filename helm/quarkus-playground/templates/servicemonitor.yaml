@@ -9,7 +9,8 @@ metadata:
 spec:
   endpoints:
   - interval: 30s
-    targetPort: "{{ .Values.serviceMonitor.port }}"
+    #targetPort: "{{ .Values.serviceMonitor.port }}"
+    port: http
     path: "{{ .Values.serviceMonitor.path }}"
     scheme: http
   selector:
