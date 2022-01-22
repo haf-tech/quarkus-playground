@@ -11,7 +11,10 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import io.quarkus.oidc.client.filter.OidcClientFilter;
 
 /**
- * REST Client representation with a own OIDC token
+ * REST Client representation with a own OIDC token to interact with a remote backend service.
+ * 
+ * The backend service endpoint is defined in `application.yml` for the key/name as this client is named.
+ * A fallback method and response is defined if the backend service is not accessible.
  * 
  * In case of @AccessToken a token propagation will be done. @OidcClientFilter
  * will retrieve a new one.

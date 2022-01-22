@@ -7,8 +7,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
+// import org.apache.kafka.clients.consumer.ConsumerRecord;
+// import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.SseElementType;
 
@@ -24,6 +24,7 @@ public class ImportantEventResource {
 
 	ConcurrentLinkedQueue<Object> events = new ConcurrentLinkedQueue<>();
 
+	/*
 	@Incoming("importantevents")
 	public void consume(ConsumerRecord<String, ?> record) {
 
@@ -39,6 +40,7 @@ public class ImportantEventResource {
 
 		events.add(value);
 	}
+	*/
 
 	@GET
 	@Path("/")
