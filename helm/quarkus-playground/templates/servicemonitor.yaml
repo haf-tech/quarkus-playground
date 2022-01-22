@@ -1,0 +1,20 @@
+{{- if .Values.serviceMonitor.create -}}
+{{- $fullName := include "quarkus-playground.fullname" . -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $fullName }}-monitor
+  labels:
+    {{- include "quarkus-playground.labels" . | nindent 4 }}
+spec:
+  endpoints:
+  - interval: 30s
+    targetPort: "{{ .Values.serviceMonitor.port }}"
+    path: "{{ .Values.serviceMonitor.path }}"
+    scheme: http
+  selector:
+    {{- with .Values.serviceMonitor.matchLabels }}
+    matchLabels:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+{{- end -}}

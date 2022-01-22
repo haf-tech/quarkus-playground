@@ -29,7 +29,7 @@ Do not use this application as entire reference for final productive system, but
 | Health API | link:http://127.0.0.1:8080/q/health[]
 | Health UI | link:http://127.0.0.1:8080/q/health-ui/[]
 | Swagger UI | link:http://127.0.0.1:8080/q/swagger-ui/[]
-| Metrics API | link:http://127.0.0.1:8080/q/metrics[]
+| Metrics API (Prometheus) | link:http://127.0.0.1:8080/q/metrics[]
 | | 
 | Secured API without role | link:http://127.0.0.1:8080/secured/date[]
 | Secured API with role | link:http://127.0.0.1:8080/secured/dateForManager[]
@@ -265,7 +265,37 @@ Quarkus tries to integrate best practices and (JEE) specifications
 
 === Micrometer and MicroProfile Metrics
 
-tbd
+link:https://quarkus.io/guides/micrometer[Micrometer] is the preferred solution for metrics in Quarkus. It provides adapter for Prometheus and MicroProfile.
+If more MicroProfile specific implementation is needed, consider to use link:https://quarkus.io/guides/smallrye-metrics[SmallRye in Quarkus].
+
+The relevant dependencies are
+
+[source,xml]
+----
+    <dependency> 
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-micrometer</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-micrometer-registry-prometheus</artifactId>
+		</dependency>
+----
+
+`CustomConfiguration.java` holds a configuration setting common metric tags for all registries. The current implementation sets the active profile in the `env` tag and the current application version in `version`.
+
+A custom metrics is also implemented, see for more details the `EchoResource.java`.
+
+The `metrics` endpoint exposes the Prometheus metrics, including the custom metric
+
+----
+# HELP quarkus_playground_echo_requests_count_total  
+# TYPE quarkus_playground_echo_requests_count_total counter
+quarkus_playground_echo_requests_count_total{app_version="1.0.1-SNAPSHOT",endpoint_version="v1",env="dev",} 2.0
+----
+
+The custom metric `quarkus_playground_echo_requests_count` contains besides the common tags (`app_version`, `end`) also the specific one `endpoint_version` which is set in the `EchoResource.java`.
 
 === OpenTelemetry and OpenTracing
 
@@ -426,6 +456,51 @@ Nevertheless S2I is a great feature for fast ramp up and enforce a unified way i
 
 .References
 * Quarkus: link:https://quarkus.pro/guides/deploying-to-openshift-s2i.html[Deploying with S2I]
+
+=== Quarkus OpenShift Extension
+
+Quarkus provides also an extension for Kubernetes and OpenShift to generate Kubernetes/OpenShift resources and deploy the application directly into cluster.
+For testing and development is totally fine, to evaluate the configuration. In the concept of CI/CD or GitOps is this not a preferred solution.
+
+----
+$ oc get route -n openshift-image-registry image-registry --template='{{.spec.host}}'
+image-registry-openshift-image-registry.....appdomain.cloud
+
+$ podman login -u $(oc whoami) -p $(oc whoami -t) image-registry-openshift-image-registry.....appdomain.cloud
+Login Succeeded!
+
+$ oc project demo-quarkus
+
+$ oc create secret generic quarkus-playground-test-secret --from-env-file=internal.env.txt
+
+$ ./mvnw clean package -Dquarkus.kubernetes.deploy=true \
+  -Dquarkus.openshift.expose=true \
+  -Dquarkus.openshift.labels.app=quarkus-playground \
+  -Dquarkus.container-image.group=demo-quarkus \
+  -Dquarkus.container-image.registry=image-registry-openshift-image-registry.....appdomain.cloud \
+  -Dquarkus.container-image.username=$(oc whoami) \
+  -Dquarkus.container-image.password=$(oc whoami -t) \
+  -Dquarkus.openshift.env.secrets=quarkus-playground-test-secret \
+  -DskipTests=true
+
+$ oc get is
+
+$ oc get pods
+NAME                          READY   STATUS      RESTARTS   AGE
+quarkus-playground-3-464j7    1/1     Running     0          4m17s
+quarkus-playground-3-deploy   0/1     Completed   0          4m22s
+
+$ oc get route
+NAME                 HOST/PORT                                           PATH   SERVICES             PORT   TERMINATION   WILDCARD
+quarkus-playground   quarkus-playground-demo-quarkus...appdomain.cloud          quarkus-playground   8080                 None
+
+----
+
+This builds and deploys the application into the cluster within the current session and namespace (here: `quarkus-demo`). Additionally the label `app=quarkus-playground` is set, pushing to ImageStream, creates a route and use a secret for env variables.
+The extension defines various (default) parameters (see link:https://quarkus.io/guides/deploying-to-openshift#configuration-reference[reference]). Some of them are e.g. setting Prometheus annotation, probes etc.
+
+.References
+* Quarkus and Openshift: link:https://quarkus.io/guides/deploying-to-openshift[Deploying to OpenShift]
 
 === Tekton Pipeline
 

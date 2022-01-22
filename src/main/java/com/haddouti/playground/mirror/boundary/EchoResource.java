@@ -12,6 +12,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.jaxrs.QueryParam;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -28,6 +31,15 @@ public class EchoResource {
 
 	static DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 
+	private final MeterRegistry registry;
+	private final Counter requestCounter;
+
+	public EchoResource(MeterRegistry mr) {
+		registry = mr;
+
+		requestCounter = registry.counter("quarkus_playground_echo_requests_count", "endpoint_version", "v1");
+	}
+
 	/**
 	 * Echos the given request with all request headers.
 	 * 
@@ -41,7 +53,8 @@ public class EchoResource {
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
 	public String echo(@QueryParam("e") String txt, @Context HttpHeaders httpHeaders) {
 		LOG.info("echo()");
-		
+		requestCounter.increment();
+
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		String formattedDateTime = currentDateTime.format(formatter);
 		//return String.format("Echo <%s>: %s", formattedDateTime, txt);

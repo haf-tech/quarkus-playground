@@ -32,6 +32,14 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
+serviceMonitor:
+  # Specifies whether a ServiceMonitor should be created to monitor using a Service
+  create: true
+  port: 8080
+  path: "/q/metrics"
+  matchLabels:
+    app: quarkus-playground
+
 podSecurityContext: {}
   # fsGroup: 2000
 

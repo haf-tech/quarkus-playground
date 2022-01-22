@@ -8,6 +8,9 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
+/**
+ * User interface calls a remote backend service to retrieve user info
+ */
 @Path("v1/users")
 public class UserResource {
 
