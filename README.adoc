@@ -199,6 +199,8 @@ Even though there is an increasing opinion that this functionality could now be 
 
 === Messaging with Kafka
 
+NOTE: Own branch `kafka`
+
 Messaging contains the aspect to interact between provider and consumer mostly in an asynchronous way. Therefor the provider exposes messages in any kind of format directly to a consumer (point-2-point) or to a broader audience (fan-out or pub/sub).
 For the latter case is link:https://kafka.apache.org/[Apache Kafka] a technical solution.
 Quarkus provides also an link:https://quarkus.io/guides/kafka[extension] to integrate and interact with Kafka.
