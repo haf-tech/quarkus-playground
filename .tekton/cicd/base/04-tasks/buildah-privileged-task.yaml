@@ -40,7 +40,7 @@ spec:
       description: Path to the Dockerfile to build.
       name: DOCKERFILE
       type: string
-    - default: .
+    - default: 'src'
       description: Path to the directory to use as context.
       name: CONTEXT
       type: string

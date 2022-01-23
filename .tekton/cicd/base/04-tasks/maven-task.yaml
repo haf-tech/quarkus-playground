@@ -61,7 +61,7 @@ spec:
       description: Protocol for the proxy ie http or https
       name: PROXY_PROTOCOL
       type: string
-    - default: .
+    - default: 'src'
       description: >-
         The context directory within the repository for sources on which we want
         to execute maven goals.
@@ -147,9 +147,9 @@ spec:
           sed -i "s|<!-- ### mirrors from ENV ### -->|$xml|" $(workspaces.maven-settings.path)/settings.xml
         fi
     - args:
-        - -Dmaven.repo.local=$(workspaces.source.path)/m2
         - '-s'
         - $(workspaces.maven-settings.path)/settings.xml
+        - -Dmaven.repo.local=$(workspaces.source.path)/m2
         - $(params.GOALS[*])
       command:
         - /usr/bin/mvn

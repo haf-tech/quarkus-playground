@@ -1,10 +1,13 @@
 # PipelineRun example to execute Pipeline "maven-ci-pipeline"
 # to build and package Quarkus app‚
+# 
+# Tekton Pipelines: v0.24.3
+# Tekton Triggers: v0.14.2
+# ClusterTasks based on Tekton Catalog 0.24
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: quarkus-pr
-  generateName: quarkus-run-
+  generateName: quarkus-build-run-
 spec:
   params:
     - name: REPO
@@ -18,7 +21,7 @@ spec:
     - name: DOCKERFILE
       value: "./src/main/docker/Dockerfile.jvm"
     - name: IMAGE
-      value: "image-registry.openshift-image-registry.svc:5000/test/quarkus-playground-tekton:latest"
+      value: "image-registry.openshift-image-registry.svc:5000/demo-quarkus-cicd/quarkus-playground-tekton:latest"
     - name: APP_IMAGE_BASE
       value: ""
     - name: APP_IMAGE_TAGS
@@ -39,7 +42,7 @@ spec:
     - name: COMMIT_MESSAGE
       value: "Test PipelineRun"
   pipelineRef:
-    name: maven-ci-pipeline
+    name: ci-pipeline-maven-buildah
   serviceAccountName: pipeline
   workspaces:
   - name: maven-settings

@@ -37,6 +37,8 @@ spec:
       value: $(params.GIT_REPO)
     - name: revision
       value: $(params.GIT_REF)
+    - name: subdirectory
+      value: 'src'
     taskRef:
       kind: ClusterTask
       name: git-clone

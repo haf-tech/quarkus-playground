@@ -7,7 +7,7 @@ metadata:
 spec:
   params:
   - name: imageRepo
-    value: image-registry.openshift-image-registry.svc:5000/tekton101-cicd/tekton-101
+    value: image-registry.openshift-image-registry.svc:5000/$(extensions.ns)/quarkus-playground
   - name: imageTag
     value: $(extensions.imgTag)
   - name: tlsVerify

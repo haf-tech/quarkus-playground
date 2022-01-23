@@ -21,13 +21,14 @@ spec:
     #      secretKey: webhook-secret-key
     #      secretName: webhook-secret-dev-tekton-101
     - cel:
-        filter: (header.match('X-GitHub-Event', 'push') && body.repository.full_name
-          == 'haf-tech/quarkus-playground')
+        filter: (header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'haf-tech/quarkus-playground')
         overlays:
         - expression: body.ref.split('/')[2]
           key: ref
         - expression: body.ref.split('/')[2]
-          key: imgTag        
+          key: imgTag      
+        - expression: 'demo-quarkus-cicd'
+          key: ns   
     name: maven-ci-build-from-push-quarkus-playground
     template:
       ref: ci-template-maven

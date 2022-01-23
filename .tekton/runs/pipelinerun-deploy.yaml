@@ -3,8 +3,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: quarkus-deploy-pr
-  generateName: quarkus-run-
+  generateName: quarkus-deploy-run-
 spec:
   params:
     - name: REPO
@@ -14,7 +13,7 @@ spec:
     - name: TLSVERIFY
       value: "false"
     - name: IMAGE
-      value: "image-registry.openshift-image-registry.svc:5000/test/quarkus-playground-tekton:latest"
+      value: "image-registry.openshift-image-registry.svc:5000/demo-quarkus-cicd/quarkus-playground-tekton:latest"
     - name: GIT_REF
       value: "main"
     - name: HELM_CHART_DIR
@@ -24,11 +23,11 @@ spec:
     - name: HELM_RELEASE_NAME
       value: "quarkus-playground-tkn-test"
     - name: HELM_RELEASE_NAMESPACE
-      value: "test"
+      value: "demo-quarkus-cicd"
     - name: HELM_VALUES_FILE
       value: "values.test.yaml"
     - name: HELM_OVERWRITE_VALUES
-      value: "image.repository=image-registry.openshift-image-registry.svc:5000/test/quarkus-playground-tekton,image.tag=latest"
+      value: "image.repository=image-registry.openshift-image-registry.svc:5000/demo-quarkus-cicd/quarkus-playground-tekton,image.tag=latest,ingress.basedomain=hcs-ocp-93ccca5014f3f64f6f228d0d086be7b3-0000.eu-de.containers.appdomain.cloud"
   pipelineRef:
     name: cd-pipeline-helm
   serviceAccountName: pipeline

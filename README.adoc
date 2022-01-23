@@ -555,9 +555,9 @@ image:static/tekton-cd-pipeline-helm.png[]
 Following the commands to execute the pipelines manually.
 
 ----
-oc apply -f .tekton/runs/pipelinerun-maven.yaml
+oc create -f .tekton/runs/pipelinerun-maven.yaml
 
-oc apply -f .tekton/runs/pipelinerun-deploy.yaml
+oc create -f .tekton/runs/pipelinerun-deploy.yaml
 ----
 
 This is a very basic Tekton pipeline to build, package and deploy an application, separating the pipeline flow in two separate pipelines for CI and CD. Generally every git commit should trigger the CI pipeline. And depending of the deployment approach and stage, the version will be automatically deployed to a temp/test stage or the CD pipeline will be triggert by an additional event like a merged pull request (to a dedicated git branch).
