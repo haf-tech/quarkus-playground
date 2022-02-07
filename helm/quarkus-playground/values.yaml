@@ -4,7 +4,7 @@
 
 replicaCount: 1
 stage: dummy
-owner: dummy-owner
+owner: lab-tech
 config:
   configmap: 
   secret: 
@@ -20,8 +20,8 @@ fullnameOverride: ""
 
 health:
   endpoint:
-    liveness: "/q/health"
-    readiness: "/q/health"
+    liveness: "/q/health/live"
+    readiness: "/q/health/ready"
 
 serviceAccount:
   # Specifies whether a service account should be created
