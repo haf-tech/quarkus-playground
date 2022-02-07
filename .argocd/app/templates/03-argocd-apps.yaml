@@ -1,0 +1,26 @@
+# ArgoCD Application
+# one repo, observing branches, results in own ArgoCD App
+{{- range .Values.config.projects }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "argocd-{{ .namespace }}"
+spec:
+  project: "{{ $.Values.config.names.base }}-prj"
+  source:
+    repoURL: https://github.com/haf-tech/quarkus-playground-config.git
+    targetRevision: 'main'
+    path: 'helm'
+    helm:
+      valueFiles:
+      - {{ .valueFile }}
+      releaseName: '{{ .namespace }}'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: '{{ .namespace }}'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+{{- end }}

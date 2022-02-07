@@ -1,0 +1,13 @@
+# ArgoCD Configuration
+
+config:
+  names:
+    base: 'argocd-demo-quarkus'
+  argocdNamespace: demo-quarkus-cicd
+  projects:
+  - namespace: demo-quarkus-dev
+    valueFile: values.dev.yaml
+  - namespace: demo-quarkus-test
+    valueFile: values.test.yaml
+  - namespace: demo-quarkus-prod
+    valueFile: values.prod.yaml
