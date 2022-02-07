@@ -1,6 +1,6 @@
 # Maven Task
 # Enhancing 0.2 for more optimized GOALS handling and Maven libs repo on Workspace
-#
+# in a "/m2" directory
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:

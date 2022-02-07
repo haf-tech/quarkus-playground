@@ -2,10 +2,11 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   creationTimestamp: null
-  name: app-ci-template
-  #namespace: tekton101-cicd
+  name: ci-template-maven
 spec:
   params:
+  - description: The image tag.
+    name: imageTag
   - description: The git branch for this PR.
     name: io.openshift.build.commit.ref
   - description: the specific commit SHA.
@@ -17,7 +18,7 @@ spec:
   - description: The commit message
     name: io.openshift.build.commit.message
   - description: The git repository URL.
-    name: gitrepositoryurl
+    name: common.git.repo.url
   - description: The GitHub repository for this PullRequest.
     name: fullname
   - description: The repository to push built images to.
@@ -28,19 +29,19 @@ spec:
     name: build_extra_args
   - description: Custom Dockerfile.
     name: dockerFile
-    default: "./Dockerfile"
+    default: "./src/main/docker/Dockerfile.jvm"
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
       creationTimestamp: null
-      name: app-ci-$(uid)
+      name: ci-app-$(uid)
     spec:
       params:
       - name: REPO
         value: $(tt.params.fullname)
       - name: GIT_REPO
-        value: $(tt.params.gitrepositoryurl)
+        value: $(tt.params.common.git.repo.url)
       - name: TLSVERIFY
         value: $(tt.params.tlsVerify)
       - name: BUILD_EXTRA_ARGS
@@ -55,6 +56,9 @@ spec:
         value: 
          - $(tt.params.io.openshift.build.commit.ref)-$(tt.params.io.openshift.build.commit.id)
          - $(tt.params.imageTag)
+      - name: MAVEN_GOALS
+        #value: "package -Dmaven.test.skip=true"
+        value: ["-Dmaven.test.skip=true", "package"]
       - name: COMMIT_SHA
         value: $(tt.params.io.openshift.build.commit.id)
       - name: GIT_REF
@@ -66,9 +70,11 @@ spec:
       - name: COMMIT_MESSAGE
         value: $(tt.params.io.openshift.build.commit.message)
       pipelineRef:
-        name: app-ci-pipeline
+        name: ci-pipeline-maven-buildah
       serviceAccountName: pipeline
       workspaces:
+      - name: maven-settings
+        emptyDir: {}
       - name: shared-data
         volumeClaimTemplate:
           metadata:

@@ -1,9 +1,9 @@
+# DEPRECATED
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   creationTimestamp: null
   name: ci-dryrun-from-push-pipeline
-  #namespace: tekton101-cicd
 spec:
   resources:
   - name: source-repo
@@ -19,4 +19,4 @@ spec:
         resource: source-repo
     taskRef:
       kind: Task
-      name: deploy-from-source-task
+      name: deploy-from-source

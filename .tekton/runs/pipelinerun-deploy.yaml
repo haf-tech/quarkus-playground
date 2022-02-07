@@ -1,5 +1,9 @@
-# PipelineRun example to execute Pipeline "maven-ci-pipeline"
-# to build and package Quarkus app‚
+# PipelineRun example to execute Pipeline "cd-pipeline-helm"
+# to deploy app using helm pipeline
+#
+# apply with "create", otherwise the name will not be generated
+# oc create -f pipelinerun-deploy.yaml
+#
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:

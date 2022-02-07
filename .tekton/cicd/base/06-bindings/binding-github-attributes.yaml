@@ -1,12 +1,13 @@
+# Binding: extract various attributes from the Git Webhook payload
+#
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   creationTimestamp: null
-  name: github-push-binding
-  #namespace: tekton101-cicd
+  name: binding-github-attributes
 spec:
   params:
-  - name: gitrepositoryurl
+  - name: common.git.repo.url
     value: $(body.repository.clone_url)
   - name: fullname
     value: $(body.repository.full_name)

@@ -1,9 +1,11 @@
+# CI Pipeline for container with buildah
+# - git clone
+# - build image
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   creationTimestamp: null
-  name: app-ci-pipeline
-  #namespace: tekton101-cicd
+  name: ci-pipeline-container
 spec:
   params:
   - name: REPO

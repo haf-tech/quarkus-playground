@@ -1,9 +1,9 @@
+# DEPRECATED
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   creationTimestamp: null
-  name: quarkus-playground-tekton-binding
-  #namespace: tekton101-cicd
+  name: binding-app-custom
 spec:
   params:
   - name: imageRepo

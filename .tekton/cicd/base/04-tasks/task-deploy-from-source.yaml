@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   creationTimestamp: null
-  name: deploy-from-source-task
+  name: deploy-from-source
   #namespace: tekton101-cicd
 spec:
   params:

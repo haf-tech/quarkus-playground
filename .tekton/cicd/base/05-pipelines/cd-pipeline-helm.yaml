@@ -1,3 +1,6 @@
+# CD Pipeline for application
+# - git clone
+# - deploy using helm
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:

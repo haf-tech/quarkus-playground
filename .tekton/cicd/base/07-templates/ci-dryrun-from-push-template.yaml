@@ -1,3 +1,4 @@
+# DEPRECATED
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
@@ -12,7 +13,7 @@ spec:
   - description: The specific commit SHA
     name: io.openshift.build.commit.id
   - description: The git repository url
-    name: gitrepositoryurl
+    name: common.git.repo.url
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
@@ -29,7 +30,7 @@ spec:
           - name: revision
             value: $(tt.params.io.openshift.build.commit.id)
           - name: url
-            value: $(tt.params.gitrepositoryurl)
+            value: $(tt.params.common.git.repo.url)
           type: git
       serviceAccountName: pipeline
     status: {}

@@ -1,9 +1,13 @@
+# EventListener
+# App/Repo specific
+#
+# repo: quarkus-playground
+# template: ci-template-maven
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   creationTimestamp: null
   name: cicd-event-listener-quarkus-playground
-  #namespace: tekton101-cicd
 spec:
   namespaceSelector: {}
   podTemplate: {}
@@ -11,8 +15,8 @@ spec:
   serviceAccountName: pipeline
   triggers:
   - bindings:
-    - ref: quarkus-playground-tekton-binding
-    - ref: github-push-binding
+    - ref: binding-app-custom
+    - ref: binding-github-attributes
     interceptors:
     # In case to secure the access use a Secret which also need to be configured in GitHub which will be
     # send with every Webhook request
@@ -29,7 +33,7 @@ spec:
           key: imgTag      
         - expression: 'demo-quarkus-cicd'
           key: ns   
-    name: maven-ci-build-from-push-quarkus-playground
+    name: trigger-quarkus-playground-push-any-branch
     template:
       ref: ci-template-maven
 status:

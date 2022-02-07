@@ -1,4 +1,5 @@
 
+# Target namespace and will be applied to all resources
 namespace: demo-quarkus-cicd
 
 bases:

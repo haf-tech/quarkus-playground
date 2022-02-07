@@ -1,9 +1,13 @@
+# CI Pipeline for application
+# - git clone, in a subdir "src"
+# - build with maven
+# - build/package image with buildah
+# 
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   creationTimestamp: null
   name: ci-pipeline-maven-buildah
-  #namespace: tekton101-cicd
 spec:
   params:
   - name: REPO

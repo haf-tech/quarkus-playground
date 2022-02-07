@@ -4,6 +4,10 @@
 # Tekton Pipelines: v0.24.3
 # Tekton Triggers: v0.14.2
 # ClusterTasks based on Tekton Catalog 0.24
+#
+# apply with "create", otherwise the name will not be generated
+# oc create -f pipelinerun-maven.yaml
+#
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
