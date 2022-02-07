@@ -9,7 +9,7 @@ config:
   secret: dummy-secret
 
 image:
-  repository: image-registry.openshift-image-registry.svc:5000/test/quarkus-playground
+  repository: image-registry.openshift-image-registry.svc:5000/demo-quarkus-cicd/quarkus-playground
   tag: jvm-v2
   pullPolicy: Always
 
