@@ -5,7 +5,7 @@
       "path": "./argocd/argocd-init",
       "revision": "main",
       "namespace": "demo-quarkus-cicd",
-      "project": "argocd-demo-quarkus-prj",
+      "project": "argocd-gov-prj",
       "valueFile": "values.yaml",
       "releaseName": "demo-quarkus-bootstrap"
     }
