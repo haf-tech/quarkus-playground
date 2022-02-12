@@ -1,6 +1,6 @@
 apiVersion: v2
 name: argocd
-description: A Helm chart to configure ArgoCD
+description: A Helm chart to initialize ArgoCD for an app/team
 
 # A chart can be either an 'application' or a 'library' chart.
 #

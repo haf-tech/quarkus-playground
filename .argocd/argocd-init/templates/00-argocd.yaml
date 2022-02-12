@@ -1,0 +1,35 @@
+
+# ArgoCD
+apiVersion: argoproj.io/v1alpha1
+kind: ArgoCD
+metadata:
+  name: {{ .Values.config.names.base | quote }}
+  namespace: {{ .Values.config.argocdNamespace | quote }} 
+spec:
+  rbac:
+    defaultPolicy: ''
+    policy: |
+      g, system:cluster-admins, role:admin
+    scopes: '[groups]'
+  {{- if .Values.config.dex.enabled }}  
+  dex:
+    openShiftOAuth: true
+    resources:
+      limits:
+        cpu: 50m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  {{- end }}
+  server:
+    insecure: true
+    route:
+      enabled: true
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
+  ha:
+    enabled: false
+  tls:
+    ca: {}

@@ -25,7 +25,7 @@ spec:
     - name: DOCKERFILE
       value: "./src/main/docker/Dockerfile.jvm"
     - name: IMAGE
-      value: "image-registry.openshift-image-registry.svc:5000/demo-quarkus-cicd/quarkus-playground-tekton:latest"
+      value: "image-registry.openshift-image-registry.svc:5000/demo-quarkus-cicd/quarkus-playground:latest"
     - name: APP_IMAGE_BASE
       value: ""
     - name: APP_IMAGE_TAGS

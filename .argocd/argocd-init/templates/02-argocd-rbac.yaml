@@ -1,0 +1,42 @@
+# RBAC
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-demo-quarkus-role
+rules:
+- apiGroups:
+  - "*"
+  resources:
+  - "*"
+  verbs:
+  - Get
+  - List
+  - Watch
+  - Patch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - rolebindings
+  verbs: ['*']
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs: ['*']
+{{- range .Values.config.projects }}
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: "argocd-{{ .namespace }}-rb"
+  namespace: {{ .namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io  
+  kind: ClusterRole
+  name: argocd-demo-quarkus-role
+subjects:
+- kind: ServiceAccount
+  name: argocd-demo-quarkus-argocd-application-controller
+  namespace: {{ $.Values.config.argocdNamespace }} 
+{{- end }}
