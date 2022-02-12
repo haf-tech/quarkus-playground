@@ -1,0 +1,12 @@
+{{- range .Values.config.projects }}
+{{- if .create }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: {{ .namespace }}
+    argocd.argoproj.io/managed-by: {{ $.Values.config.argocdNamespace }}
+  name: {{ .namespace }}
+{{- end }}
+{{- end }}

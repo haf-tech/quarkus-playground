@@ -1,0 +1,14 @@
+# ArgoCD Configuration
+
+config:
+  names:
+    base: 'argocd-gov'
+  argocdNamespace: demo-quarkus-cicd
+  boostrapValueFile: values.yaml
+  appset:
+    enabled: true
+  dex:
+    enabled: false
+  projects: []
+#  - namespace: demo-quarkus-dev
+#    create: true

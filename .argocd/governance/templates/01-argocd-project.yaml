@@ -1,0 +1,19 @@
+# AppProject
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: "{{ .Values.config.names.base }}-prj"
+  namespace: {{ .Values.config.argocdNamespace | quote }} 
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  destinations:
+    - namespace: '*'
+      server: '*' 
+    {{- range .Values.config.projects }}
+    - namespace: '{{ .namespace }}'
+      server: '*'    
+    {{- end }}
+  sourceRepos:
+    - '*'

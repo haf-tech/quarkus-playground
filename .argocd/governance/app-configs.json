@@ -1,0 +1,12 @@
+[
+    {
+      "name": "demo-quarkus-bootstrap",
+      "repo": "https://github.com/haf-tech/quarkus-playground.git",
+      "path": "./argocd/argocd-init",
+      "revision": "main",
+      "namespace": "demo-quarkus-cicd",
+      "project": "argocd-demo-quarkus-prj",
+      "valueFile": "values.yaml",
+      "releaseName": "demo-quarkus-bootstrap"
+    }
+  ]
