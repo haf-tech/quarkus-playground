@@ -122,6 +122,8 @@ This chapters summarize the integrated technologies and components in the applic
 | OpenTelemetry | OpenTelemetry support
 | OpenTelemetry Jaeger | OpenTelemetry and Jaeger adapter
 | Oidc | OIDC support
+| Panache | JPA Abstraction
+| Vert.x | in-memory event/messaging support
 | Smallrye Health | Health
 | Kubernetes / OpenShift | Kubernetes and OpenShift support
 | Jib | Docker creation support with Jib
@@ -197,9 +199,94 @@ Even though there is an increasing opinion that this functionality could now be 
 
 * Quarkus Fault Tolerance: link:https://quarkus.io/guides/smallrye-fault-tolerance[]
 
+=== JPA with Panache
+
+Quarkus provides with Panache an additional abstraction for interacting with databases. In the background e.g. Hibernate ORM for JPA is used. But enhanced with additional features following convention over configuration/implementation.
+
+Quarkus supports also reactive usage of databases. However not all database clients are reactive, like H2.
+
+Panache generates internally the common database access methods like `findAll`, `findBy*`, `persist/delete/count` etc. Using the link:https://www.martinfowler.com/eaaCatalog/activeRecord.html[Active Record pattern]. But the link:https://www.martinfowler.com/eaaCatalog/repository.html[Repository implementation] is also possible.
+
+The following configuration sets the following adjustments
+
+* enables database metrics to be exposed
+* set H2 as DB
+* DB URL
+* ORM configurations, to automatically create the DB and schema
+* store the generated scripts
+
+NOTE: Especially the automatic DDL creation should be *only* used for development! Change this in the upper environment specific variables/profiles.
+
+[source,yaml]
+----
+quarkus:
+  # ...
+
+  # ### Database default configuration using H2
+  datasource:
+    metrics:
+      enabled: true
+    db-kind: h2
+    jdbc:
+      url: jdbc:h2:mem:testdb
+  
+  hibernate-orm:
+    database:
+    # schema in H2 not supported
+#      default-schema: 'quarkuspg'
+      generation: 
+        ~: 'drop-and-create'
+        create-schemas: true
+    scripts:
+      generation:
+        ~: 'drop-and-create'
+        create-target: './create-ddl.sql'
+        drop-target: './drop-ddl.sql'
+
+----
+
+The automatically created DDL scripts looks like the following snippets
+
+.`create-ddl.sql`
+[source,sql]
+----
+create sequence hibernate_sequence start with 1 increment by 1;
+create table RequestResponsePair (id bigint not null, createdAt timestamp, requestBody clob, requestHeaders varchar(1000), responseBody clob, responseHeaders varchar(1000), primary key (id));
+----
+
+.`drop-ddl.sql`
+[source,sql]
+----
+drop table if exists RequestResponsePair CASCADE ;
+drop sequence if exists hibernate_sequence;
+----
+
+==== References
+
+* Quarkus ORM with Panache: link:https://quarkus.io/guides/hibernate-orm-panache[]
+* Quarkus Reactive SQL Clients: link:https://quarkus.io/guides/reactive-sql-clients[]
+* Quarkus Panache Active Record Pattern: link:https://quarkus.io/guides/hibernate-orm-panache#solution-1-using-the-active-record-pattern[]
+* Quarkus Panache Repository Pattern: link:https://quarkus.io/guides/hibernate-orm-panache#solution-2-using-the-repository-pattern[]
+
+=== In-Memory Messaging with Vert.x
+
+Quarkus provides with Vert.x a solution to handle in-memory messages supporting the following use cases
+
+* `point-to-point`
+* `publish/subscribe`
+* `broadcast`
+
+`EchoResource` fires an event and `RequestResponseManager` observes and consumes such events.
+Consider, that this logic is in an own (IO) thread and do not perform blocking activities from there.
+
+==== References
+
+* Quarkus Event bus: link:https://quarkus.io/guides/reactive-event-bus[]
+* Quarkus and Reactive: link:https://quarkus.io/guides/getting-started-reactive[]
+
 === Messaging with Kafka
 
-NOTE: Own branch `kafka`
+NOTE: Logic is in own branch link:tree/kafka[`kafka`]
 
 Messaging contains the aspect to interact between provider and consumer mostly in an asynchronous way. Therefor the provider exposes messages in any kind of format directly to a consumer (point-2-point) or to a broader audience (fan-out or pub/sub).
 For the latter case is link:https://kafka.apache.org/[Apache Kafka] a technical solution.
@@ -371,6 +458,8 @@ The link:helm[] directory contains the Helm chart, generated with Helm3 and adap
 * use `image.tag` for versioning and not `Chart.appVersion`
 * provide various value files, representing various stages (like dev, test, prod)
 
+NOTE: the most up-to-date helm configuration for this app is in the own repo link:https://github.com/haf-tech/quarkus-playground-config[quarkus-playground-config] to fulfill the GitOps principles.
+
 .Install/Upgrade via Helm3
 ----
 $ helm3 upgrade --install quarkus-test helm/quarkus-playground -f helm/quarkus-playground/values.test.yaml
@@ -515,23 +604,22 @@ The pipeline is separated in CI and CD pipelines, building the app and push to t
 ----
 oc apply -k .tekton/cicd/overlays/
 
-serviceaccount/pipeline configured
-clusterrole.rbac.authorization.k8s.io/pipelines-clusterrole configured
-rolebinding.rbac.authorization.k8s.io/internal-registry-cicd-binding configured
-clusterrolebinding.rbac.authorization.k8s.io/pipelines-privileged-role-binding configured
-clusterrolebinding.rbac.authorization.k8s.io/pipelines-service-role-binding configured
-route.route.openshift.io/gitops-webhook-event-listener-route configured
+serviceaccount/pipeline unchanged
+clusterrole.rbac.authorization.k8s.io/pipelines-clusterrole unchanged
+rolebinding.rbac.authorization.k8s.io/internal-registry-cicd-binding unchanged
+clusterrolebinding.rbac.authorization.k8s.io/pipelines-privileged-role-binding unchanged
+clusterrolebinding.rbac.authorization.k8s.io/pipelines-service-role-binding unchanged
+route.route.openshift.io/gitops-webhook-event-listener-route unchanged
 pipeline.tekton.dev/cd-pipeline-helm unchanged
-pipeline.tekton.dev/ci-dryrun-from-push-pipeline unchanged
 pipeline.tekton.dev/ci-pipeline-maven-buildah unchanged
 task.tekton.dev/buildah-v0-22-0-privileged unchanged
-task.tekton.dev/deploy-from-source-task unchanged
+task.tekton.dev/deploy-from-source unchanged
 task.tekton.dev/kaniko-v0-5-1 configured
 task.tekton.dev/maven-v0-2-1 unchanged
-eventlistener.triggers.tekton.dev/cicd-event-listener-quarkus-playground created
-triggerbinding.triggers.tekton.dev/github-push-binding configured
-triggerbinding.triggers.tekton.dev/quarkus-playground-tekton-binding configured
-triggertemplate.triggers.tekton.dev/ci-dryrun-from-push-template configured
+eventlistener.triggers.tekton.dev/cicd-event-listener-quarkus-playground configured
+triggerbinding.triggers.tekton.dev/binding-app-custom configured
+triggerbinding.triggers.tekton.dev/binding-github-attributes configured
+triggertemplate.triggers.tekton.dev/ci-template-maven created
 ----
 
 This installs various configurations like service account, role bindings, tasks for build app with maven, package with buildah and deployment with helm. The following tasks are optimized
@@ -576,6 +664,20 @@ ERRO (unable to determine exit status)
 See link:https://access.redhat.com/solutions/6232211[] which holds the info, that on RHEL compute nodes the user namespace should be enabled.
 Alternative is to use `kaniko` or set the scc `privileged` to the service account `pipeline` and set `securityContext.privileged: true` to the task execution.
 
+=== ArgoCD
+
+ArgoCD will be used for observing the cluster and configuration and reconsile any changes in the configuration.
+
+.Apply the ArgoCD configuration
+----
+oc apply -k .argocd/overlays/
+appproject.argoproj.io/argocd-demo-quarkus-prj created
+applicationset.argoproj.io/argocd-demo-quarkus-appset created
+argocd.argoproj.io/argocd-demo-quarkus created
+----
+
+.References
+* Plan secure GitOps practices - link:https://developers.redhat.com/articles/2021/08/03/managing-gitops-control-planes-secure-gitops-practices[]
 
 === IBM Cloud Code Engine
 

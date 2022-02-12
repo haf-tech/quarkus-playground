@@ -14,6 +14,27 @@ quarkus:
   container-image:
     builder: jib
 
+  # ### Database default configuration using H2
+  datasource:
+    metrics:
+      enabled: true
+    db-kind: h2
+    jdbc:
+      url: jdbc:h2:mem:testdb
+  
+  hibernate-orm:
+    database:
+    # schema in H2 not supported
+#      default-schema: 'quarkuspg'
+      generation: 
+        ~: 'drop-and-create'
+        create-schemas: true
+    scripts:
+      generation:
+        ~: 'drop-and-create'
+        create-target: './work/create-ddl.sql'
+        drop-target: './work/drop-ddl.sql'
+
   # ### OpenID Connect  
   oidc:
 #    authentication:
