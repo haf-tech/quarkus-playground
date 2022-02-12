@@ -1,0 +1,36 @@
+# ArgoCD Application: Serves as bootstrap for the custom App
+{{- if .Values.config.appset.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: "{{ .Values.config.names.base }}-bootstrap-appset"
+  namespace: {{ .Values.config.argocdNamespace | quote }} 
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/haf-tech/quarkus-playground-config.git
+      revision: main
+      files:
+      - path: "argocd/config.json"
+  template:
+    metadata:
+      name: '{{`{{name}}`}}'
+    spec:
+      project: argocd-bootstrap-project
+      source:
+        repoURL: '{{`{{repo}}`}}'
+        targetRevision: '{{`{{revision}}`}}'
+        path: '{{`{{path}}`}}'
+        helm:
+        valueFiles:
+        - '{{`{{valueFile}}`}}'
+        releaseName: '{{`{{releaseName}}`}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{`{{namespace}}`}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+{{- end }}

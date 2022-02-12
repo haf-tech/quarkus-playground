@@ -5,6 +5,8 @@ config:
     base: 'argocd-demo-quarkus'
   argocdNamespace: demo-quarkus-cicd
   boostrapValueFile: values.yaml
+  appset:
+    enabled: true
   dex:
     enabled: false
   projects:
