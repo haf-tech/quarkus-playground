@@ -2,7 +2,7 @@
     {
       "name": "demo-quarkus-bootstrap",
       "repo": "https://github.com/haf-tech/quarkus-playground.git",
-      "path": ".argocd/argocd-init",
+      "path": "/.argocd/argocd-init",
       "revision": "main",
       "namespace": "demo-quarkus-cicd",
       "project": "argocd-gov-prj",
