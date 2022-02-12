@@ -1,4 +1,5 @@
 resources:
+- 00-pre/pvc.yaml
 #- 01-namespaces/cicd-environment.yaml
 - 02-rolebindings/internal-registry-cicd-binding.yaml
 - 02-rolebindings/pipeline-service-account.yaml
