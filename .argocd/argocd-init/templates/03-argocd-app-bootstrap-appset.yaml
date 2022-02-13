@@ -17,7 +17,7 @@ spec:
     metadata:
       name: '{{`{{name}}`}}'
     spec:
-      project: argocd-bootstrap-project
+      project: argocd-demo-quarkus-prj
       source:
         repoURL: '{{`{{repo}}`}}'
         targetRevision: '{{`{{revision}}`}}'

@@ -14,7 +14,7 @@ spec:
     path: 'argocd'
     helm:
       valueFiles:
-      - {{ .Values.config.boostrapValueFile }}
+      - {{ .Values.config.bootstrap.valueFile }}
       releaseName: '{{ .Values.config.names.base }}-bootstrap'
   destination:
     server: https://kubernetes.default.svc

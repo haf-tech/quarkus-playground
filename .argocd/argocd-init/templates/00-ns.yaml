@@ -6,7 +6,7 @@ kind: Namespace
 metadata:
   labels:
     kubernetes.io/metadata.name: {{ .namespace }}
-    argocd.argoproj.io/managed-by: {{ $.Values.config.argocdNamespace }}
+    argocd.argoproj.io/managed-by: {{ $.Values.config.bootstrap.argocdNamespace }}
   name: {{ .namespace }}
 {{- end }}
 {{- end }}

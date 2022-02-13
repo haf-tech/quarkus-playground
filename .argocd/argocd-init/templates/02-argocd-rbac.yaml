@@ -37,6 +37,6 @@ roleRef:
   name: "{{ $.Values.config.names.base }}-role"
 subjects:
 - kind: ServiceAccount
-  name: argocd-demo-quarkus-argocd-application-controller
+  name: "{{ $.Values.config.names.base }}-argocd-application-controller"
   namespace: {{ $.Values.config.argocdNamespace }} 
 {{- end }}

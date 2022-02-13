@@ -3,10 +3,12 @@
 config:
   names:
     base: 'argocd-demo-quarkus'
+  bootstrap:
+    argocdNamespace: demo-quarkus-gov
+    valueFile: values.yaml
   argocdNamespace: demo-quarkus-cicd
-  boostrapValueFile: values.yaml
   appset:
-    enabled: true
+    enabled: false
   dex:
     enabled: false
   projects:
