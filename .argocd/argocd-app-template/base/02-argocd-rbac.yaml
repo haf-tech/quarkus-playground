@@ -1,0 +1,88 @@
+---
+# Source: argocd/templates/02-argocd-rbac.yaml
+# RBAC
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "argocd-demo-quarkus-role"
+rules:
+- apiGroups:
+  - "*"
+  resources:
+  - "*"
+  verbs:
+  - Get
+  - List
+  - Watch
+  - Patch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - rolebindings
+  verbs: ['*']
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs: ['*']
+---
+# Source: argocd/templates/02-argocd-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: "argocd-demo-quarkus-dev-rb"
+  namespace: demo-quarkus-dev
+roleRef:
+  apiGroup: rbac.authorization.k8s.io  
+  kind: ClusterRole
+  name: "argocd-demo-quarkus-role"
+subjects:
+- kind: ServiceAccount
+  name: "argocd-demo-quarkus-argocd-application-controller"
+  namespace: demo-quarkus-cicd
+---
+# Source: argocd/templates/02-argocd-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: "argocd-demo-quarkus-test-rb"
+  namespace: demo-quarkus-test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io  
+  kind: ClusterRole
+  name: "argocd-demo-quarkus-role"
+subjects:
+- kind: ServiceAccount
+  name: "argocd-demo-quarkus-argocd-application-controller"
+  namespace: demo-quarkus-cicd
+---
+# Source: argocd/templates/02-argocd-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: "argocd-demo-quarkus-prod-rb"
+  namespace: demo-quarkus-prod
+roleRef:
+  apiGroup: rbac.authorization.k8s.io  
+  kind: ClusterRole
+  name: "argocd-demo-quarkus-role"
+subjects:
+- kind: ServiceAccount
+  name: "argocd-demo-quarkus-argocd-application-controller"
+  namespace: demo-quarkus-cicd
+---
+# Source: argocd/templates/02-argocd-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: "argocd-demo-quarkus-cicd-rb"
+  namespace: demo-quarkus-cicd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io  
+  kind: ClusterRole
+  name: "argocd-demo-quarkus-role"
+subjects:
+- kind: ServiceAccount
+  name: "argocd-demo-quarkus-argocd-application-controller"
+  namespace: demo-quarkus-cicd

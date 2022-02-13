@@ -1,0 +1,25 @@
+---
+# Source: argocd/templates/01-argocd-project.yaml
+# AppProject
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: "argocd-demo-quarkus-prj"
+  namespace: "demo-quarkus-cicd" 
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  destinations:
+    - namespace: 'demo-quarkus-dev'
+      server: '*'
+    - namespace: 'demo-quarkus-test'
+      server: '*'
+    - namespace: 'demo-quarkus-prod'
+      server: '*'
+    - namespace: 'demo-quarkus-cicd'
+      server: '*'
+  sourceRepos:
+    - '*'

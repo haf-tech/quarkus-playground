@@ -1,0 +1,48 @@
+---
+# Source: argocd/templates/04-argocd-servicemonitor.yaml
+# ServiceMonitors: monitoring metrics from the main ArgoCD components
+---
+# Source: argocd/templates/04-argocd-servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: "argocd-demo-quarkus-repo-server-monitor"
+  namespace: "demo-quarkus-cicd" 
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "argocd-demo-quarkus-repo-server"
+  endpoints:
+  - port: metrics
+---
+# Source: argocd/templates/04-argocd-servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: "argocd-demo-quarkus-metrics-monitor"
+  namespace: "demo-quarkus-cicd" 
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "argocd-demo-quarkus-metrics"
+  endpoints:
+  - port: metrics
+---
+# Source: argocd/templates/04-argocd-servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: "argocd-demo-quarkus-server-metrics-monitor"
+  namespace: "demo-quarkus-cicd" 
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "argocd-demo-quarkus-server-metrics"
+  endpoints:
+  - port: metrics

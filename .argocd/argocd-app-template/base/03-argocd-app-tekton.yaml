@@ -1,0 +1,23 @@
+---
+# Source: argocd/templates/03-argocd-app-tekton.yaml
+# ArgoCD Application: Managing Tekton pipeline
+---
+# Source: argocd/templates/03-argocd-app-tekton.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "argocd-demo-quarkus-tekton"
+  namespace: "demo-quarkus-cicd" 
+spec:
+  project: "argocd-demo-quarkus-prj"
+  source:
+    repoURL: https://github.com/haf-tech/quarkus-playground.git
+    targetRevision: 'main'
+    path: '.tekton/cicd/overlays'    
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: 'demo-quarkus-cicd'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
