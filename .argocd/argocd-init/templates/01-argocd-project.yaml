@@ -4,6 +4,8 @@ kind: AppProject
 metadata:
   name: "{{ .Values.config.names.base }}-prj"
   namespace: {{ .Values.config.argocdNamespace | quote }} 
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
 spec:
   clusterResourceWhitelist:
     - group: '*'
