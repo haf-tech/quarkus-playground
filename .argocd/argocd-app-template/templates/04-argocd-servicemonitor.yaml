@@ -1,0 +1,24 @@
+# ServiceMonitors: monitoring metrics from the main ArgoCD components
+{{- if not .Values.config.appset.enabled }}
+{{- range .Values.config.projects }}
+{{ $project := . }}
+{{ $components := list "repo-server" "metrics" "server-metrics" }}
+{{- range $components }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: "{{ $project.name }}-{{ . }}-monitor"
+  namespace: {{ $project.managedNamespace | quote }} 
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "{{ $project.name }}-{{ . }}"
+  endpoints:
+  - port: metrics
+{{- end }}
+{{- end }}
+{{- end }}
+

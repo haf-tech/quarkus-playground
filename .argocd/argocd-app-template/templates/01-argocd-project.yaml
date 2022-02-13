@@ -1,0 +1,22 @@
+# AppProject
+{{- range .Values.config.projects }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: "{{ .name }}-prj"
+  namespace: {{ .managedNamespace | quote }} 
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  destinations:
+    {{- range .namespaces }}
+    - namespace: '{{ .namespace }}'
+      server: '*'    
+    {{- end }}
+  sourceRepos:
+    - '*'
+{{- end }}

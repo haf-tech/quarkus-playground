@@ -1,0 +1,25 @@
+# ArgoCD Application: Managing Tekton pipeline
+{{- if not .Values.config.appset.enabled }}
+{{- range .Values.config.projects }}
+{{ $mangedNamespace := .managedNamespace }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "{{ .name }}-tekton"
+  namespace: {{ $.Values.config.argocdNamespace | quote }} 
+spec:
+  project: "{{ $.Values.config.names.base }}-prj"
+  source:
+    repoURL: {{ .repo }}
+    targetRevision: '{{ .repo }}'
+    path: '.tekton/cicd/overlays'    
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: '{{ $mangedNamespace }}'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+{{- end }}
+{{- end }}

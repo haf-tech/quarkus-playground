@@ -1,3 +1,0 @@
----
-# Source: argocd/templates/03-argocd-app-bootstrap-appset.yaml
-# ArgoCD Application: Serves as bootstrap for the custom App

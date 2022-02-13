@@ -1,0 +1,31 @@
+# ArgoCD Configuration
+
+config:
+  names:
+    base: 'argocd-demo-quarkus'
+  bootstrap:
+    argocdNamespace: demo-quarkus-gov
+    valueFile: values.yaml
+  argocdNamespace: demo-quarkus-cicd
+  # ApplicationSet is not working properly outside openshift-gitops namespace
+  appset:
+    enabled: false
+  dex:
+    enabled: false
+  projects: 
+    - name: demo-quarkus-app
+      managedNamespace: demo-quarkus-cicd
+      repo: https://github.com/haf-tech/quarkus-playground-config.git
+      branch: main
+      path: 'argocd'
+      helmValueFile: values.yaml
+      configJson: argocd/config.json
+      namespaces:
+      - namespace: demo-quarkus-cicd
+        create: false
+      - namespace: demo-quarkus-test
+        create: false
+      - namespace: demo-quarkus-dev
+        create: false
+      - namespace: demo-quarkus-prod
+        create: false

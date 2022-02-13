@@ -1,0 +1,29 @@
+# ArgoCD Application: Serves as bootstrap for the custom App
+{{- if not .Values.config.appset.enabled }}
+{{- range .Values.config.projects }}
+{{ $mangedNamespace := .managedNamespace }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "{{ .name }}-bootstrap"
+  namespace: {{ $mangedNamespace | quote }} 
+spec:
+  project: "{{ $.Values.config.names.base }}-prj"
+  source:
+    repoURL: {{ .repo }}
+    targetRevision: '{{ .branch }}'
+    path: '{{ .path }}'
+    helm:
+      valueFiles:
+      - {{ .helmValueFile }}
+      releaseName: '{{ .name }}-bootstrap'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: '{{ $mangedNamespace }}'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+{{- end }}
+{{- end }}
