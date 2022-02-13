@@ -19,4 +19,4 @@ config:
   - namespace: demo-quarkus-prod
     create: true
   - namespace: demo-quarkus-cicd
-    create: false
+    create: true
