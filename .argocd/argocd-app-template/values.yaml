@@ -10,8 +10,10 @@ config:
   # ApplicationSet is not working properly outside openshift-gitops namespace
   appset:
     enabled: false
+  tekton:
+    enabled: true
   dex:
-    enabled: false
+    enabled: true
   projects: 
     - name: demo-quarkus-app
       managedNamespace: demo-quarkus-cicd

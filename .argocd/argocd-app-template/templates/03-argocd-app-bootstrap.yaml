@@ -9,7 +9,7 @@ metadata:
   name: "{{ .name }}-bootstrap"
   namespace: {{ $mangedNamespace | quote }} 
 spec:
-  project: "{{ $.Values.config.names.base }}-prj"
+  project: "{{ .name }}-prj"
   source:
     repoURL: {{ .repo }}
     targetRevision: '{{ .branch }}'

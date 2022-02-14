@@ -7,7 +7,7 @@ metadata:
   namespace: {{ .Values.config.argocdNamespace | quote }} 
 spec:
   rbac:
-    defaultPolicy: ''
+    defaultPolicy: 'role:readonly'
     policy: |
       g, system:cluster-admins, role:admin
     scopes: '[groups]'
@@ -22,6 +22,8 @@ spec:
         cpu: 50m
         memory: 128Mi
   {{- end }}
+  # Enable ApplicationSet support
+  applicationSet: {}
   server:
     insecure: true
     route:

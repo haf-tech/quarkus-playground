@@ -1,5 +1,5 @@
 # ArgoCD Application: Managing Tekton pipeline
-{{- if not .Values.config.appset.enabled }}
+{{- if .Values.config.tekton.enabled }}
 {{- range .Values.config.projects }}
 {{ $mangedNamespace := .managedNamespace }}
 ---
@@ -7,12 +7,14 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: "{{ .name }}-tekton"
-  namespace: {{ $.Values.config.argocdNamespace | quote }} 
+  #namespace: {{ $.Values.config.argocdNamespace | quote }} 
+  namespace: "openshift-gitops" 
 spec:
-  project: "{{ $.Values.config.names.base }}-prj"
+  #project: "{{ .name }}-prj"
+  project: "default"
   source:
-    repoURL: {{ .repo }}
-    targetRevision: '{{ .repo }}'
+    repoURL: https://github.com/haf-tech/quarkus-playground.git
+    targetRevision: 'main'
     path: '.tekton/cicd/overlays'    
   destination:
     server: https://kubernetes.default.svc
