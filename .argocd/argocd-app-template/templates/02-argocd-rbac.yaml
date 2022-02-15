@@ -42,7 +42,7 @@ rules:
   - argoproj.io
   resources:
   - argocds
-  - approjects
+  - appprojects
   - applicationsets
   verbs: ['*']
 # Tekton
