@@ -90,20 +90,22 @@ subjects:
 
 # #######
 # Assign for the bootstrap ArgoCD sa the role to manage the bootstrap and common resources
+{{- range .Values.config.bootstrap.serviceaccounts }}
 ---
 # Set rolebinding for the bootstrap/common sa in the managing namespace of project
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: "argocd-bootstrap-rb"
-  namespace: "{{ .Values.config.argocdNamespace }}"
+  name: "{{ . }}-rb"
+  namespace: "{{ $.Values.config.argocdNamespace }}"
   annotations:
     argocd.argoproj.io/sync-wave: "-50"
 roleRef:
   apiGroup: rbac.authorization.k8s.io  
   kind: ClusterRole
-  name: "{{ .Values.config.names.base }}-role"
+  name: "{{ $.Values.config.names.base }}-role"
 subjects:
 - kind: ServiceAccount
-  name: "{{ .Values.config.bootstrap.serviceaccount }}"
+  name: "{{ . }}"
   namespace: "{{ $.Values.config.bootstrap.argocdNamespace }}" 
+{{- end }}

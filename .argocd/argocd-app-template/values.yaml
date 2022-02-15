@@ -6,7 +6,9 @@ config:
   bootstrap:
     argocdNamespace: openshift-gitops
     valueFile: values.yaml
-    serviceaccount: argocd-argocd-application-controller
+    serviceaccounts: 
+    - argocd-argocd-application-controller
+    - openshift-gitops-argocd-application-controller
   argocdNamespace: demo-quarkus-cicd
   # ApplicationSet is not working properly outside openshift-gitops namespace
   appset:
