@@ -43,6 +43,7 @@ rules:
   resources:
   - argocds
   - appprojects
+  - applications
   - applicationsets
   verbs: ['*']
 # Tekton
