@@ -1,14 +1,29 @@
-# ArgoCD Configuration
+# Application Governance Configuration
+# Holds the basic configuration
+# - namespaces
 
 config:
-  names:
-    base: 'argocd-gov'
-  argocdNamespace: demo-quarkus-cicd
-  boostrapValueFile: values.yaml
   appset:
-    enabled: true
-  dex:
     enabled: false
-  projects: []
-#  - namespace: demo-quarkus-dev
-#    create: true
+  bootstrap:
+    name: argo-project-gov
+    repo: https://github.com/haf-tech/quarkus-playground.git
+    branch: main
+    path: '.argocd/argocd-app-template'
+    helmValueFile: values.yaml
+    argocdNamespace: openshift-gitops
+    argocdProject: default
+    #configJson: argocd/config.json    
+  projects: 
+    - name: demo-quarkus-app
+      managedNamespace: demo-quarkus-cicd
+      namespaces:
+      - namespace: demo-quarkus-cicd
+        create: true
+      - namespace: demo-quarkus-test
+        create: true
+      - namespace: demo-quarkus-dev
+        create: true
+      - namespace: demo-quarkus-prod
+        create: true
+

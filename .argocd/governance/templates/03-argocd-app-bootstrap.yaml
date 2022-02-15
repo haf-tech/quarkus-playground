@@ -1,0 +1,30 @@
+# ArgoCD Application: Manages all governend apps/teams
+{{- if not .Values.config.appset.enabled }}
+{{- with .Values.config.bootstrap }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "{{ .name }}-apps"
+  namespace: {{ .argocdNamespace | quote }} 
+spec:
+  project: {{ .argocdProject | quote }}
+  source:
+    repoURL: {{ .repo | quote }}
+    targetRevision: {{ .branch | quote }}
+    path: {{ .path | quote }}
+    {{- if .helmValueFile }}
+    helm:
+      valueFiles:
+      - {{ .helmValueFile }}
+      releaseName: "{{ .name }}-apps"
+    {{- end }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .argocdNamespace | quote }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+{{- end }}
+{{- end }}
