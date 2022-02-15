@@ -59,6 +59,7 @@ rules:
   resources:
   - tasks
   - pipelines
+  - pipelineruns
   verbs: ['*']
 - apiGroups:
   - "*"
