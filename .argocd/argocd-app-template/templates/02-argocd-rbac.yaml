@@ -94,6 +94,8 @@ kind: RoleBinding
 metadata:
   name: "argocd-bootstrap-rb"
   namespace: "{{ .Values.config.argocdNamespace }}"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-50"
 roleRef:
   apiGroup: rbac.authorization.k8s.io  
   kind: ClusterRole
