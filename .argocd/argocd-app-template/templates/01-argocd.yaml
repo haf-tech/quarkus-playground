@@ -7,6 +7,7 @@ metadata:
   namespace: {{ .Values.config.argocdNamespace | quote }} 
 spec:
   rbac:
+    # default readonly allows that everyone (also via OCP oauth) can see all resources
     defaultPolicy: 'role:readonly'
     policy: |
       g, system:cluster-admins, role:admin
@@ -22,8 +23,10 @@ spec:
         cpu: 50m
         memory: 128Mi
   {{- end }}
+  {{- if .Values.config.appset.enabled }}
   # Enable ApplicationSet support
   applicationSet: {}
+  {{- end }}
   server:
     insecure: true
     route:

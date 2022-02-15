@@ -14,10 +14,12 @@ spec:
     repoURL: {{ .repo }}
     targetRevision: '{{ .branch }}'
     path: '{{ .path }}'
+    {{- if .helmValueFile }}
     helm:
       valueFiles:
       - {{ .helmValueFile }}
       releaseName: '{{ .name }}-bootstrap'
+    {{- end }}
   destination:
     server: https://kubernetes.default.svc
     namespace: '{{ $mangedNamespace }}'
