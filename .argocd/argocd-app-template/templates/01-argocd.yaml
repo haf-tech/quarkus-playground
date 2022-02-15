@@ -5,6 +5,8 @@ kind: ArgoCD
 metadata:
   name: {{ .Values.config.names.base | quote }}
   namespace: {{ .Values.config.argocdNamespace | quote }} 
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
 spec:
   rbac:
     # default readonly allows that everyone (also via OCP oauth) can see all resources
