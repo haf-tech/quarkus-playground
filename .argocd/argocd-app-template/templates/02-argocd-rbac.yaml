@@ -35,6 +35,14 @@ rules:
   resources:
   - routes
   verbs: ['*']
+# ArgoCD
+- apiGroups:
+  - argoproj.io
+  resources:
+  - argocds
+  - approjects
+  - applicationsets
+  verbs: ['*']
 # Tekton
 - apiGroups:
   - triggers.tekton.dev
