@@ -20,6 +20,32 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: '{{ $mangedNamespace }}'
+  # Various rules to ignore fields
+  ignoreDifferences:
+  - group: argoproj.io
+    jsonPointers:
+    - /status
+    kind: Application
+  - group: triggers.tekton.dev
+    jsonPointers:
+    - /status
+    kind: EventListener
+  - group: triggers.tekton.dev
+    jsonPointers:
+    - /status
+    kind: TriggerTemplate
+  - group: triggers.tekton.dev
+    jsonPointers:
+    - /status
+    kind: TriggerBinding
+  - group: route.openshift.io
+    jsonPointers:
+    - /spec/host
+    kind: Route
+  - group: bitnami.com
+    jsonPointers:
+    - /status
+    kind: SealedSecret
   syncPolicy:
     automated:
       prune: true
