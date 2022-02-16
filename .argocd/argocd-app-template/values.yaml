@@ -10,7 +10,7 @@ config:
     - argocd-argocd-application-controller
     - openshift-gitops-argocd-application-controller
   argocdNamespace: demo-quarkus-cicd
-  # ApplicationSet is not working properly outside openshift-gitops namespace
+  # ApplicationSet: consider to enable it in ArgoCD "applicationset: {}"
   appset:
     enabled: false
   tekton:

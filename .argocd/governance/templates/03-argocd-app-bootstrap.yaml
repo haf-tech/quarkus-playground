@@ -1,6 +1,42 @@
 # ArgoCD Application: Manages all governend apps/teams
 {{- if not .Values.config.appset.enabled }}
-{{- with .Values.config.bootstrap }}
+{{- range .Values.config.projects }}
+{{- if .configJson }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: "{{ .name }}-appset"
+  namespace: {{ .argocdNamespace | quote }} 
+spec:
+  generators:
+  - git:
+      repoURL: {{ .repo }}
+      revision: '{{ .branch }}'
+      files:
+      - path: '{{ .configJson }}'
+  template:
+    metadata:
+      name: '{{`{{name}}`}}'
+    spec:
+      project: '{{`{{project}}`}}'
+      source:
+        repoURL: '{{`{{repo}}`}}'
+        targetRevision: '{{`{{revision}}`}}'
+        path: '{{`{{path}}`}}'
+        #helm:
+        #valueFiles:
+        #- '{{`{{valueFile}}`}}'
+        #releaseName: '{{`{{releaseName}}`}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{`{{namespace}}`}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+{{- else }}
+{{ $mangedNamespace := .managedNamespace }}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -26,5 +62,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
+{{- end }}
 {{- end }}
 {{- end }}

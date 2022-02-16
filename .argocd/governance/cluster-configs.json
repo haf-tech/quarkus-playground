@@ -1,0 +1,12 @@
+[
+    {
+      "name": "external-secrets-operator",
+      "repo": "https://github.com/ocp-universe/ocp-recipes.git",
+      "path": "03-cluster-capabilities",
+      "revision": "main",
+      "namespace": "openshift-gitops",
+      "project": "default",
+      "valueFile": "",
+      "releaseName": ""
+    }
+  ]
