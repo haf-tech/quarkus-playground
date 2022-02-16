@@ -7,7 +7,8 @@ config:
   appset:
     enabled: false
   projects: 
-    - name: demo-quarkus-app
+    # Base configuration for all app teams and projects
+    - name: gov-projects
       managedNamespace: demo-quarkus-cicd
       repo: https://github.com/haf-tech/quarkus-playground.git
       branch: main
@@ -25,7 +26,8 @@ config:
         create: true
       - namespace: demo-quarkus-prod
         create: true
-    - name: argo-cluster-config
+    # Common cluster configuration and capabilities for all teams/projects
+    - name: gov-cluster-config
       managedNamespace: demo-quarkus-cicd
       repo: https://github.com/haf-tech/quarkus-playground.git
       branch: main
