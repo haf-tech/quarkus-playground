@@ -40,3 +40,6 @@ spec:
     enabled: false
   tls:
     ca: {}
+  # Enable the possibility to reference helm charts in kustomize (helmCharts)
+  # feature available since kustomize 4.1.0  
+  kustomizeBuildOptions: '--enable-helm'
