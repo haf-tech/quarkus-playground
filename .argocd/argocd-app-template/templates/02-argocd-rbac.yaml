@@ -71,6 +71,12 @@ rules:
   resources:
   - serviceaccounts
   verbs: ["*"]
+# ExternalSecrets
+- apiGroups:
+  - external-secrets.io
+  resources:
+  - externalsecrets
+  verbs: ["*"]
 
 # #######
 # Assign for the app specific ArgoCD sa the role in the app specific namespaces
