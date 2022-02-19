@@ -16,6 +16,13 @@ rules:
   - List
   - Watch
   - Patch
+# Apps
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  - deployments
+  verbs: ['*']
 # setting rolebinding
 - apiGroups:
   - rbac.authorization.k8s.io
@@ -70,6 +77,8 @@ rules:
   - "*"
   resources:
   - serviceaccounts
+  - services
+  - secrets
   verbs: ["*"]
 # ExternalSecrets
 - apiGroups:
