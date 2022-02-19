@@ -3,6 +3,12 @@
 # - namespaces
 # - apps to configure cluster or entire app projects
 
+# Open
+# - AppSet for projects, instead of apps (to group all project related resources to one)
+# - test cluster-config integration
+# - Pipeline resources, part of default ArgoCD or project-scope/visibility (permission!)
+# - Optimize Namespace configuration for DevOps Team (gov + app-tpl)
+
 config:
   appset:
     enabled: false

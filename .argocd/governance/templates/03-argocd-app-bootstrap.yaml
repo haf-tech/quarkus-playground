@@ -14,7 +14,7 @@ spec:
       repoURL: {{ .repo }}
       revision: '{{ .branch }}'
       files:
-      - path: '{{ .configJson }}'
+      - path: '{{ .path }}/{{ .configJson }}'
   template:
     metadata:
       name: '{{`{{name}}`}}'
@@ -23,7 +23,7 @@ spec:
       source:
         repoURL: '{{`{{repo}}`}}'
         targetRevision: '{{`{{revision}}`}}'
-        path: '{{`{{path}}`}}'
+        path: '{{`{{srcPath}}`}}'
         #helm:
         #valueFiles:
         #- '{{`{{valueFile}}`}}'
