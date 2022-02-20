@@ -3,6 +3,8 @@ kind: TriggerTemplate
 metadata:
   creationTimestamp: null
   name: ci-template-maven
+  annotations:
+    argocd.argoproj.io/sync-wave: "-30"
 spec:
   params:
   - description: The image tag.

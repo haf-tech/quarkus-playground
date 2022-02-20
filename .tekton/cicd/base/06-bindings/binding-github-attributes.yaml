@@ -5,6 +5,8 @@ kind: TriggerBinding
 metadata:
   creationTimestamp: null
   name: binding-github-attributes
+  annotations:
+    argocd.argoproj.io/sync-wave: "-40"
 spec:
   params:
   - name: common.git.repo.url

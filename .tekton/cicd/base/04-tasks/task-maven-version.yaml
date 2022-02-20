@@ -4,6 +4,8 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: maven-get-project-version
+  annotations:
+    argocd.argoproj.io/sync-wave: "-60"
 spec:
   workspaces:
     - name: source

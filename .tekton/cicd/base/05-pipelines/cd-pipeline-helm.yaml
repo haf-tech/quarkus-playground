@@ -7,6 +7,8 @@ metadata:
   creationTimestamp: null
   name: cd-pipeline-helm
   #namespace: tekton101-cicd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-50"
 spec:
   params:
   - name: GIT_REPO

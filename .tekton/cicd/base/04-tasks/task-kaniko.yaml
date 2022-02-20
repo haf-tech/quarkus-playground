@@ -13,6 +13,7 @@ metadata:
     tekton.dev/tags: image-build
     tekton.dev/displayName: "Build and upload container image using Kaniko"
     tekton.dev/platforms: "linux/amd64"
+    argocd.argoproj.io/sync-wave: "-60"
 spec:
   description: >-
     This Task builds source into a container image using Google's kaniko tool.

@@ -8,6 +8,7 @@ metadata:
     tekton.dev/pipelines.minVersion: 0.12.1
     tekton.dev/platforms: 'linux/amd64,linux/s390x,linux/ppc64le'
     tekton.dev/tags: build-tool
+    argocd.argoproj.io/sync-wave: "-60"
   name: maven-v0-2-1
   labels:
     app.kubernetes.io/version: '0.2.1'

@@ -4,6 +4,8 @@ kind: Pipeline
 metadata:
   creationTimestamp: null
   name: ci-dryrun-from-push-pipeline
+  annotations:
+    argocd.argoproj.io/sync-wave: "-50"
 spec:
   resources:
   - name: source-repo

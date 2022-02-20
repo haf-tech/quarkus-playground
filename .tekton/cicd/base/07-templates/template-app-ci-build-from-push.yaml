@@ -4,6 +4,8 @@ metadata:
   creationTimestamp: null
   name: app-ci-template
   #namespace: tekton101-cicd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-30"
 spec:
   params:
   - description: The git branch for this PR.

@@ -8,6 +8,8 @@ kind: EventListener
 metadata:
   creationTimestamp: null
   name: cicd-event-listener-quarkus-playground
+  annotations:
+    argocd.argoproj.io/sync-wave: "-20"
 spec:
   namespaceSelector: {}
   #podTemplate: {}

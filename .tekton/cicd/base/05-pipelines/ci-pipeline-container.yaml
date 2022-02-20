@@ -6,6 +6,8 @@ kind: Pipeline
 metadata:
   creationTimestamp: null
   name: ci-pipeline-container
+  annotations:
+    argocd.argoproj.io/sync-wave: "-50"
 spec:
   params:
   - name: REPO

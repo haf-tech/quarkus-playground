@@ -8,6 +8,7 @@ metadata:
   annotations:
     tekton.dev/pipelines.minVersion: '0.19'
     tekton.dev/tags: image-build
+    argocd.argoproj.io/sync-wave: "-60"
   name: buildah-v0-22-0-privileged
   generation: 1
   labels:

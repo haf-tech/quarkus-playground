@@ -4,6 +4,8 @@ metadata:
   creationTimestamp: null
   name: ci-pipeline-maven-kaniko
   #namespace: tekton101-cicd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-50"
 spec:
   params:
   - name: REPO

@@ -4,6 +4,8 @@ metadata:
   creationTimestamp: null
   name: deploy-from-source
   #namespace: tekton101-cicd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-60"
 spec:
   params:
   - default: "false"
