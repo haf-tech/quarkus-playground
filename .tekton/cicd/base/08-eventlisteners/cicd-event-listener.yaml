@@ -1,4 +1,4 @@
-# EventListener
+# EventListener, Trigger v0.12.x
 # App/Repo specific
 #
 # repo: quarkus-playground
@@ -28,22 +28,15 @@ spec:
     #    secretRef:
     #      secretKey: webhook-secret-key
     #      secretName: webhook-secret-dev-tekton-101
-    - params:
-        - name: filter
-          value: >-
-            (header.match('X-GitHub-Event', 'push') &&
-            body.repository.full_name == 'haf-tech/quarkus-playground')
-        - name: overlays
-          value:
-            - expression: 'body.ref.split(''/'')[2]'
-              key: ref
-            - expression: 'body.ref.split(''/'')[2]'
-              key: imgTag
-            - expression: demo-quarkus-cicd
-              key: ns
-      ref:
-        kind: ClusterInterceptor
-        name: cel
+    - cel:
+        filter: "(header.match('X-GitHub-Event', 'push') && body.repository.full_name == 'haf-tech/quarkus-playground')"
+        overlays:
+        - expression: 'body.ref.split(''/'')[2]'
+          key: ref
+        - expression: 'body.ref.split(''/'')[2]'
+          key: imgTag
+        - expression: demo-quarkus-cicd
+          key: ns    
     name: trigger-quarkus-playground-push-any-branch
     template:
       ref: ci-template-maven
