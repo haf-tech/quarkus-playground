@@ -41,11 +41,14 @@ spec:
     - name: SONAR_TOKEN_SECRET_NAME
       description: Secret name holding Token for sonar.login
       default: ""
+    - name: SONAR_TOKEN
+      description: Token for sonar.login
+      default: ""
   steps:
     - name: sonar-properties-create
       image: registry.access.redhat.com/ubi8/ubi-minimal:8.2
       env:
-      - name: SECRET_TOKEN
+      - name: SONAR_TOKEN
         valueFrom:
           secretKeyRef:
             name: $(params.SONAR_TOKEN_SECRET_NAME)
@@ -69,6 +72,8 @@ spec:
           fi
         }
 
+        $(params.SONAR_TOKEN)=$(SONAR_TOKEN)
+        
         if [[ -f $(workspaces.sonar-settings.path)/sonar-project.properties ]]; then
           echo "using user provided sonar-project.properties file"
           cp -RL $(workspaces.sonar-settings.path)/sonar-project.properties $(workspaces.source.path)/sonar-project.properties
