@@ -60,6 +60,8 @@ spec:
   workspaces:
   - name: maven-settings
     emptyDir: {}
+  - name: sonar-settings
+    emptyDir: {}
   - name: shared-data
     persistentVolumeClaim:
       claimName: pipeline-repo-pvc

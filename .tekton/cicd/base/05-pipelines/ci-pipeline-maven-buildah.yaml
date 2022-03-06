@@ -1,6 +1,7 @@
 # CI Pipeline for application
 # - git clone, in a subdir "src"
 # - build with maven
+# - sonarqube scan
 # - build/package image with buildah
 # 
 apiVersion: tekton.dev/v1beta1
@@ -37,6 +38,8 @@ spec:
   - name: MAVEN_GOALS
     type: array
   tasks:
+  # ##################
+  # Git clone
   - name: clone-source
     params:
     - name: url
@@ -51,6 +54,8 @@ spec:
     workspaces:
     - name: output
       workspace: shared-data
+  # ##################
+  # Build app
   - name: build-app
     params:
     - name: GOALS
@@ -67,6 +72,28 @@ spec:
       workspace: shared-data
     - name: maven-settings
       workspace: maven-settings
+  # ##################
+  # Build app
+  - name: sonarqube-scan
+    params:
+    - name: SONAR_HOST_URL
+      value: http://sonarqube-sonarqube.sonarqube:9000
+    - name: SONAR_PROJECT_KEY
+      value: quarkus-demo
+    runAfter:
+    - build-app
+    taskRef:
+      #kind: ClusterTask
+      #name: maven
+      kind: Task
+      name: sonarqube-scanner
+    workspaces:
+    - name: source
+      workspace: shared-data
+    - name: sonar-settings
+      workspace: sonar-settings
+  # ##################
+  # Build container image
   - name: build-image
     params:
     - name: TLSVERIFY
@@ -92,3 +119,5 @@ spec:
     name: shared-data
   - description: This workspace will hold the Maven Settings (temp dir).
     name: maven-settings
+  - description: This workspace will hold the SonarQube Settings (temp dir).
+    name: sonar-settings

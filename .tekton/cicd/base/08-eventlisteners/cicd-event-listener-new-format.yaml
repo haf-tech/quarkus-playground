@@ -1,0 +1,52 @@
+# EventListener
+# App/Repo specific
+#
+# repo: quarkus-playground
+# template: ci-template-maven
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  creationTimestamp: null
+  name: cicd-event-listener-quarkus-playground
+  annotations:
+    argocd.argoproj.io/sync-wave: "-20"
+spec:
+  namespaceSelector: {}
+  #podTemplate: {}
+  resources: {}
+  serviceAccountName: pipeline
+  triggers:
+  - bindings:
+    - kind: TriggerBinding
+      ref: binding-app-custom
+    - kind: TriggerBinding
+      ref: binding-github-attributes
+    interceptors:
+    # In case to secure the access use a Secret which also need to be configured in GitHub which will be
+    # send with every Webhook request
+    #- github:
+    #    secretRef:
+    #      secretKey: webhook-secret-key
+    #      secretName: webhook-secret-dev-tekton-101
+    - params:
+        - name: filter
+          value: >-
+            (header.match('X-GitHub-Event', 'push') &&
+            body.repository.full_name == 'haf-tech/quarkus-playground')
+        - name: overlays
+          value:
+            - expression: 'body.ref.split(''/'')[2]'
+              key: ref
+            - expression: 'body.ref.split(''/'')[2]'
+              key: imgTag
+            - expression: demo-quarkus-cicd
+              key: ns
+      ref:
+        kind: ClusterInterceptor
+        name: cel
+    name: trigger-quarkus-playground-push-any-branch
+    template:
+      ref: ci-template-maven
+status:
+  configuration:
+    generatedName: ""
