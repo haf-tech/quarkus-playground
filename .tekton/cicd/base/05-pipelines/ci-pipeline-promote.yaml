@@ -92,7 +92,7 @@ spec:
       value: 
       - 'helm/values.dev.yaml'
     - name: EXPRESSION
-      value: 'image.digest="sha256:3663791abc50c432fd8c214ce8a5197f6e44ca80a0600c4352ddc7e173450a9b"'
+      value: '.image.digest="sha256:3663791abc50c432fd8c214ce8a5197f6e44ca80a0600c4352ddc7e173450a9b"'
     runAfter:
     - clone-manifest
     when:
