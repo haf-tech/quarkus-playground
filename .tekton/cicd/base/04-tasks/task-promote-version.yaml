@@ -61,7 +61,7 @@ spec:
             pwd
             ls -l 
             echo "--------------------"
-            /usr/bin/yq eval '$(params.EXPRESSION)' -i "$var" -v
+            /usr/bin/yq eval '$(params.EXPRESSION)' -i "$(pwd)/$var" -v
             
             #/usr/bin/yq eval '.image.digest="sha256:7d9b09f45f5df8874bfc4d63b3d00e5b80b0751e0770bdde197c0f5a9b2e487d"' -i "$var" -v
             #/usr/bin/yq eval '.image.digest="sha2567d9b09f45f5df8874bfc4d63b3d00e5b80b0751e0770bdde197c0f5a9b2e487d"' -i "$var" -v
