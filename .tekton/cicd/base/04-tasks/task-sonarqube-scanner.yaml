@@ -44,7 +44,7 @@ spec:
   steps:
     - name: sonar-properties-create
       image: registry.access.redhat.com/ubi8/ubi-minimal:8.2
-      envVar:
+      env:
       - name: SECRET_TOKEN
         valueFrom:
           secretKeyRef:
