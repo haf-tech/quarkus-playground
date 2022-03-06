@@ -24,9 +24,6 @@ public class AssetResource {
 	@Inject
 	SecurityIdentity securityIdentity;
 
-//	@Inject
-//	JsonWebToken jwt;
-
 	@Path("")
 	@GET
 	@PermitAll

@@ -38,6 +38,7 @@ Do not use this application as entire reference for final productive system, but
 | Kafka Topic SSE | link:http://127.0.0.1:8080/v1/importantevents[]
 | | 
 | Simple Echo endpoint | link:http://127.0.0.1:8080/v1/mirror/?e=TestMessage[]
+| List requests (from DB) | link:http://127.0.0.1:8080/v1/mirror/list/pairs[]
 |===
 
 == Usage
@@ -130,6 +131,7 @@ This chapters summarize the integrated technologies and components in the applic
 | Logging Json | JSON support for logging
 | JUnit5 | JUnit
 | RESTassured | REST test framework
+| Jacoco | Test coverage support
 
 |===
 

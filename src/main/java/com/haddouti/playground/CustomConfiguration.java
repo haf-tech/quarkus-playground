@@ -17,7 +17,7 @@ import io.quarkus.runtime.configuration.ProfileManager;
 @Singleton
 public class CustomConfiguration {
     
-    @ConfigProperty(name = "quarkus.application.version")
+    @ConfigProperty(name = "quarkus.application.version", defaultValue = "0.0.0")
     String appVersion;
 
     /** 
