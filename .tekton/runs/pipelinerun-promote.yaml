@@ -1,0 +1,83 @@
+# PipelineRun example to execute Pipeline "maven-ci-pipeline"
+# to build and package Quarkus app‚
+# 
+# Tekton Pipelines: v0.24.3
+# Tekton Triggers: v0.14.2
+# ClusterTasks based on Tekton Catalog 0.24
+#
+# apply with "create", otherwise the name will not be generated
+# oc create -f pipelinerun-maven.yaml
+#
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: quarkus-promote-run-
+spec:
+  params:
+    - name: REPO
+      value: "quarkus-playground"
+    - name: GIT_REPO
+      value: "https://github.com/haf-tech/quarkus-playground"
+    - name: TLSVERIFY
+      value: "false"
+    - name: BUILD_EXTRA_ARGS
+      value: ""
+    - name: DOCKERFILE
+      value: "./src/main/docker/Dockerfile.jvm"
+    - name: IMAGE
+      value: "image-registry.openshift-image-registry.svc:5000/demo-quarkus-cicd/quarkus-playground:latest"
+    - name: IMAGE_REMOTE_CR
+      value: "de.icr.io/demo/demo-quarkus/quarkus-playground:latest"
+    - name: APP_IMAGE_BASE
+      value: ""
+    - name: APP_IMAGE_TAGS
+      value: 
+        - "main-latest"
+        - "latest"
+    - name: MAVEN_GOALS
+      #value: "package -Dmaven.test.skip=true"
+      value: ["-Dmaven.test.skip=false", "package"]
+    - name: COMMIT_SHA
+      value: "1233"
+    - name: GIT_REF
+      value: "main"
+    - name: COMMIT_DATE
+      value: "2021-09-26T11:04:15+00:00"
+    - name: COMMIT_AUTHOR
+      value: "code@haddouti.com"
+    - name: COMMIT_MESSAGE
+      value: "Test PipelineRun"
+    - name: SONAR_PROJECT_KEY
+      value: "quarkus-demo"
+    - name: SONAR_TOKEN_SECRET_NAME
+      value: "sonarqube-token-secret"
+    - name: GIT_CONFIG_REPO
+      value: "https://github.com/haf-tech/quarkus-playground-config"
+    - name: GIT_CONFIG_REF
+      value: "test-promotion"
+    - name: REMOTE_CR_PUSH_ENABLED
+      value: "false"
+  pipelineRef:
+    name: ci-pipeline-promote
+  serviceAccountName: pipeline
+  workspaces:
+  - name: maven-settings
+    emptyDir: {}
+  - name: sonar-settings
+    emptyDir: {}
+  - name: shared-data
+    persistentVolumeClaim:
+      #claimName: pipeline-repo-pvc
+      claimName: pipeline-repo-rwm-pvc
+#  - name: shared-data
+#    volumeClaimTemplate:
+#      metadata:
+#        creationTimestamp: null
+#      spec:
+#        accessModes:
+#        - ReadWriteOnce
+#        resources:
+#          requests:
+#            storage: 1Gi
+#      status: {}
+  

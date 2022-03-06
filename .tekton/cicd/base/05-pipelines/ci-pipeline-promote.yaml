@@ -87,12 +87,12 @@ spec:
     - name: CONTEXT_DIR
       value: 'src_manifest'
     - name: IMAGE_DIGEST
-      value: $(tasks.build-image.results.IMAGE_DIGEST)
+      value: 'abcd'
     - name: FILES
       value: 
       - 'helm/values.dev.yaml'
     - name: EXPRESSION
-      value: 'image.digest=$(tasks.build-image.results.IMAGE_DIGEST)'
+      value: 'image.digest=abcd'
     runAfter:
     - clone-manifest
     when:
