@@ -58,7 +58,7 @@ spec:
         do
             echo $var
             echo "$(params.EXPRESSION)"
-            /usr/bin/yq eval "$(params.EXPRESSION)" -i "$var"
+            /usr/bin/yq eval '$(params.EXPRESSION)' -i "$var"
         done
     - name: push-git
       image: $(params.GIT_IMAGE)
