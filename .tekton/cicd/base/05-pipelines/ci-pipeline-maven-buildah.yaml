@@ -44,6 +44,9 @@ spec:
     type: string
   - name: SONAR_TOKEN_SECRET_NAME
     type: string
+  - name: IMAGE_SCAN_ENABLED
+    type: string
+    default: "true"
   tasks:
   # ##################
   # Git clone
@@ -124,6 +127,22 @@ spec:
     taskRef:
       kind: Task
       name: buildah-v0-22-0-privileged
+    workspaces:
+    - name: source
+      workspace: shared-data
+  # ##################
+  # Trivy
+  - name: img-scan-trivy
+    params:
+    - name: image-url
+      value: $(params.IMAGE)
+    - name: scan-image
+      value: $(paramas.IMAGE_SCAN_ENABLED)
+    runAfter:
+    - build-image
+    taskRef:
+      kind: Task
+      name: ibm-img-scan-trivy
     workspaces:
     - name: source
       workspace: shared-data

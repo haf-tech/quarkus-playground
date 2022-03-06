@@ -1,0 +1,15 @@
+# TaskRun: Trivy
+---
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: taskrun-trivy-
+spec:
+  taskRef:
+    name: ibm-img-scan-trivy
+  params:
+    - name: image-url
+      value: image-registry.openshift-image-registry.svc:5000/demo-quarkus-cicd/quarkus-playground:latest
+    - name: scan-image
+      value: "true"
+  
