@@ -44,6 +44,9 @@ spec:
     - name: SONAR_TOKEN
       description: Token for sonar.login
       default: ""
+    - name: CONTEXT_DIR
+      description: Context dir, default src
+      default: "src"
   steps:
     - name: sonar-properties-create
       image: registry.access.redhat.com/ubi8/ubi-minimal:8.2
@@ -53,7 +56,7 @@ spec:
           secretKeyRef:
             name: $(params.SONAR_TOKEN_SECRET_NAME)
             key: 'token'
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.CONTEXT_DIR)
       script: |
         #!/usr/bin/env bash
 
@@ -105,6 +108,6 @@ spec:
 
     - name: sonar-scan
       image: docker.io/sonarsource/sonar-scanner-cli:4.5@sha256:b8c95a37025f3c13162118cd55761ea0b2a13d1837f9deec51b7b6d82c52040a #tag: 4.5
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.CONTEXT_DIR)
       command:
         - sonar-scanner
