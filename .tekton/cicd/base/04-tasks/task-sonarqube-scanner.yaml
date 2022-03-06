@@ -72,8 +72,8 @@ spec:
           fi
         }
 
-        $(params.SONAR_TOKEN)=$(SONAR_TOKEN)
-        
+        $(params.SONAR_TOKEN)=${SONAR_TOKEN}
+
         if [[ -f $(workspaces.sonar-settings.path)/sonar-project.properties ]]; then
           echo "using user provided sonar-project.properties file"
           cp -RL $(workspaces.sonar-settings.path)/sonar-project.properties $(workspaces.source.path)/sonar-project.properties
