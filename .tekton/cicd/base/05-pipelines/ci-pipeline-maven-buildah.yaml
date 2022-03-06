@@ -37,6 +37,10 @@ spec:
     type: string
   - name: MAVEN_GOALS
     type: array
+  - name: SONAR_PROJECT_KEY
+    type: string
+  - name: SONAR_TOKEN_SECRET_NAME
+    type: string
   tasks:
   # ##################
   # Git clone
@@ -79,7 +83,9 @@ spec:
     - name: SONAR_HOST_URL
       value: http://sonarqube-sonarqube.sonarqube:9000
     - name: SONAR_PROJECT_KEY
-      value: quarkus-demo
+      value: $(params.SONAR_PROJECT_KEY)
+    - name: SONAR_TOKEN_SECRET_NAME
+      value: $(params.SONAR_TOKEN_SECRET_NAME)
     runAfter:
     - build-app
     taskRef:

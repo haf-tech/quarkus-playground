@@ -45,6 +45,10 @@ spec:
       value: "code@haddouti.com"
     - name: COMMIT_MESSAGE
       value: "Test PipelineRun"
+    - name: SONAR_PROJECT_KEY
+      value: "quarkus-demo"
+    - name: SONAR_TOKEN_SECRET_NAME
+      value: "sonarqube-token-secret"
   pipelineRef:
     name: ci-pipeline-maven-buildah
   serviceAccountName: pipeline
@@ -55,7 +59,8 @@ spec:
     emptyDir: {}
   - name: shared-data
     persistentVolumeClaim:
-      claimName: pipeline-repo-pvc
+      #claimName: pipeline-repo-pvc
+      claimName: pipeline-repo-rwm-pvc
 #  - name: shared-data
 #    volumeClaimTemplate:
 #      metadata:

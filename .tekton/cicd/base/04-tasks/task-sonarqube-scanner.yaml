@@ -4,7 +4,7 @@
 # v0.2 - enhanced
 #
 # Enhancements
-# - add sonar.login support as parameter
+# - add sonar.login support as parameter (from a Secret)
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -38,12 +38,18 @@ spec:
     - name: SONAR_PROJECT_KEY
       description: Project's unique key
       default: ""
-    - name: SONAR_TOKEN
-      description: Token for sonar.login
+    - name: SONAR_TOKEN_SECRET_NAME
+      description: Secret name holding Token for sonar.login
       default: ""
   steps:
     - name: sonar-properties-create
       image: registry.access.redhat.com/ubi8/ubi-minimal:8.2
+      envVar:
+      - name: SECRET_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: $(params.SONAR_TOKEN_SECRET_NAME)
+            key: 'token'
       workingDir: $(workspaces.source.path)
       script: |
         #!/usr/bin/env bash
