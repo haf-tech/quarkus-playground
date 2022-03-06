@@ -137,7 +137,7 @@ spec:
     - name: image-url
       value: $(params.IMAGE)
     - name: scan-image
-      value: $(paramas.IMAGE_SCAN_ENABLED)
+      value: $(params.IMAGE_SCAN_ENABLED)
     runAfter:
     - build-image
     taskRef:

@@ -1,0 +1,97 @@
+# Buildah base version v0.22.0
+# Tag and Push, helpful for repush to an other Container Registry
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: '0.19'
+    tekton.dev/tags: image-build
+    argocd.argoproj.io/sync-wave: "-60"
+  name: buildah-tag-push
+  generation: 1
+  labels:
+    app.kubernetes.io/version: '0.1'
+    operator.tekton.dev/provider-type: redhat
+spec:
+  description: >-
+    Buildah task builds source into a container image and then pushes it to a
+    container registry.
+
+    Tags an existing image and Push to a container registry
+  params:
+    - description: Reference of the exiting image (incl. tag).
+      name: IMAGE_OLD
+      type: string
+    - description: Reference of the new image buildah will produce.
+      name: IMAGE_NEW
+      type: string
+    - default: >-
+        registry.redhat.io/rhel8/buildah@sha256:6a68ece207bc5fd8db2dd5cc2d0b53136236fb5178eb5b71eebe5d07a3c33d13
+      description: The location of the buildah builder image.
+      name: BUILDER_IMAGE
+      type: string
+    - default: vfs
+      description: Set buildah storage driver
+      name: STORAGE_DRIVER
+      type: string
+    - default: ./Dockerfile
+      description: Path to the Dockerfile to build.
+      name: DOCKERFILE
+      type: string
+    - default: 'src'
+      description: Path to the directory to use as context.
+      name: CONTEXT
+      type: string
+    - default: 'true'
+      description: >-
+        Verify the TLS on the registry endpoint (for push/pull to a non-TLS
+        registry)
+      name: TLSVERIFY
+      type: string
+    - default: oci
+      description: 'The format of the built container, oci or docker'
+      name: FORMAT
+      type: string
+    - default: ''
+      description: Extra parameters passed for the build command when building images.
+      name: BUILD_EXTRA_ARGS
+      type: string
+    - default: ''
+      description: Extra parameters passed for the push command when pushing images.
+      name: PUSH_EXTRA_ARGS
+      type: string
+  results:
+    - description: Digest of the image just built.
+      name: IMAGE_DIGEST
+  steps:
+    - image: $(params.BUILDER_IMAGE)
+      name: tag
+      resources: {}
+      script: |
+        buildah --storage-driver=$(params.STORAGE_DRIVER) tag \
+          $(params.BUILD_EXTRA_ARGS) $(params.IMAGE_OLD) $(params.IMAGE_NEW)
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
+      workingDir: $(workspaces.source.path)
+      securityContext:
+        privileged: true
+    - image: $(params.BUILDER_IMAGE)
+      name: push
+      resources: {}
+      script: |
+        buildah --storage-driver=$(params.STORAGE_DRIVER) push \
+          $(params.PUSH_EXTRA_ARGS) --tls-verify=$(params.TLSVERIFY) \
+          --digestfile $(workspaces.source.path)/image-digest $(params.IMAGE_NEW) \
+          docker://$(params.IMAGE_NEW)
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
+      workingDir: $(workspaces.source.path)
+      securityContext:
+        privileged: true
+  volumes:
+    - emptyDir: {}
+      name: varlibcontainers
+  workspaces:
+    - name: source
