@@ -12,3 +12,18 @@ spec:
   accessModes:
     - ReadWriteOnce
   #persistentVolumeReclaimPolicy: Retain 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pipeline-repo-rwm-pvc
+  annotations:
+    argocd.argoproj.io/sync-wave: "-100"
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  #persistentVolumeReclaimPolicy: Retain 
