@@ -72,7 +72,10 @@ spec:
           fi
         }
 
-        $(params.SONAR_TOKEN)=${SONAR_TOKEN}
+        sonarToken=${SONAR_TOKEN}
+        if [[ -n "$(params.SONAR_TOKEN)" ]]; then
+            sonarToken=$(params.SONAR_TOKEN)
+        fi
 
         if [[ -f $(workspaces.sonar-settings.path)/sonar-project.properties ]]; then
           echo "using user provided sonar-project.properties file"
@@ -86,14 +89,14 @@ spec:
           if [[ -n "$(params.SONAR_PROJECT_KEY)" ]]; then
             replaceValues $(workspaces.source.path)/sonar-project.properties sonar.projectKey $(params.SONAR_PROJECT_KEY)
           fi
-          if [[ -n "$(params.SONAR_TOKEN)" ]]; then
-            replaceValues $(workspaces.source.path)/sonar-project.properties sonar.login $(params.SONAR_TOKEN)
+          if [[ -n "$sonarToken" ]]; then
+            replaceValues $(workspaces.source.path)/sonar-project.properties sonar.login $sonarToken
           fi
         else
           touch sonar-project.properties
           echo "sonar.projectKey=$(params.SONAR_PROJECT_KEY)" >> sonar-project.properties
           echo "sonar.host.url=$(params.SONAR_HOST_URL)" >> sonar-project.properties
-          echo "sonar.login=$(params.SONAR_TOKEN)" >> sonar-project.properties
+          echo "sonar.login=$sonarToken" >> sonar-project.properties
           echo "sonar.sources=." >> sonar-project.properties
         fi
 
