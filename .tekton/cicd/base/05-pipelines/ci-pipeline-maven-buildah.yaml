@@ -202,7 +202,7 @@ spec:
       value: 
       - 'helm/values.dev.yaml'
     - name: EXPRESSION
-      value: 'image.digest="$(tasks.build-image.results.IMAGE_DIGEST)"'
+      value: '.image.digest="$(tasks.build-image.results.IMAGE_DIGEST)"'
     runAfter:
     - clone-manifest
     when:
