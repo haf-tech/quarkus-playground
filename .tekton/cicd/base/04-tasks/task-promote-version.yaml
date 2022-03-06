@@ -33,7 +33,7 @@ spec:
     - name: YQ_IMAGE
       type: string
       description: The yq image to use.
-      default: docker.io/mikefarah/yq:4.16.2@sha256:0d4f6e27bdcac7316f635acd524ab0eecc4ad50834b54d10322268650c7712cb
+      default: docker.io/mikefarah/yq:4.21.1@sha256:7d9b09f45f5df8874bfc4d63b3d00e5b80b0751e0770bdde197c0f5a9b2e487d
     - name: CONTEXT_DIR
       type: string
       description: Context directory
@@ -58,7 +58,7 @@ spec:
         do
             echo $var
             echo "$(params.EXPRESSION)"
-            /usr/bin/yq eval '$(params.EXPRESSION)' -i "$var"
+            /usr/bin/yq eval '$(params.EXPRESSION)' -i "$var" -v
         done
     - name: push-git
       image: $(params.GIT_IMAGE)
