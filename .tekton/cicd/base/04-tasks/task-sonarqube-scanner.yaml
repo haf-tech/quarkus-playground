@@ -80,20 +80,22 @@ spec:
             sonarToken=$(params.SONAR_TOKEN)
         fi
 
+        sonarSettingsPath=$(workspaces.source.path)/$(params.CONTEXT_DIR)/sonar-project.properties
+        
         if [[ -f $(workspaces.sonar-settings.path)/sonar-project.properties ]]; then
           echo "using user provided sonar-project.properties file"
-          cp -RL $(workspaces.sonar-settings.path)/sonar-project.properties $(workspaces.source.path)/sonar-project.properties
+          cp -RL $(workspaces.sonar-settings.path)/sonar-project.properties $sonarSettingsPath
         fi
 
-        if [[ -f $(workspaces.source.path)/sonar-project.properties ]]; then
+        if [[ -f $sonarSettingsPath ]]; then
           if [[ -n "$(params.SONAR_HOST_URL)" ]]; then
-            replaceValues $(workspaces.source.path)/sonar-project.properties sonar.host.url $(params.SONAR_HOST_URL)
+            replaceValues $sonarSettingsPath sonar.host.url $(params.SONAR_HOST_URL)
           fi
           if [[ -n "$(params.SONAR_PROJECT_KEY)" ]]; then
-            replaceValues $(workspaces.source.path)/sonar-project.properties sonar.projectKey $(params.SONAR_PROJECT_KEY)
+            replaceValues $sonarSettingsPath sonar.projectKey $(params.SONAR_PROJECT_KEY)
           fi
           if [[ -n "$sonarToken" ]]; then
-            replaceValues $(workspaces.source.path)/sonar-project.properties sonar.login $sonarToken
+            replaceValues $sonarSettingsPath sonar.login $sonarToken
           fi
         else
           touch sonar-project.properties
@@ -106,7 +108,7 @@ spec:
         echo "# Updated $(date '+%Y-%m-%d %H:%M:%S')" >> sonar-project.properties
 
         echo "---------------------------"
-        cat $(workspaces.source.path)/sonar-project.properties
+        cat $sonarSettingsPath
         echo "---------------------------"
         cat $(workspaces.source.path)/$(params.CONTEXT_DIR)/sonar-project.properties
 
