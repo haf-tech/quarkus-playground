@@ -103,6 +103,8 @@ spec:
           echo "sonar.sources=." >> sonar-project.properties
         fi
 
+        echo "# Updated $(date '+%Y-%m-%d %H:%M:%S')" >> sonar-project.properties
+
         echo "---------------------------"
         cat $(workspaces.source.path)/sonar-project.properties
         echo "---------------------------"
