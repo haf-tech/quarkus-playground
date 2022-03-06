@@ -23,6 +23,7 @@ resources:
 #- 05-pipelines/ci-pipeline-container.yaml
 #- 05-pipelines/ci-pipeline-maven-kaniko.yaml
 - 05-pipelines/ci-pipeline-maven-buildah.yaml
+- 05-pipelines/ci-pipeline-promote.yaml
 #- 05-pipelines/ci-dryrun-from-push-pipeline.yaml
 - 05-pipelines/cd-pipeline-helm.yaml
 - 06-bindings/binding-app-custom.yaml
