@@ -15,6 +15,7 @@ resources:
 - 04-tasks/task-kaniko.yaml
 - 04-tasks/task-buildah-privileged.yaml
 - 04-tasks/task-sonarqube-scanner.yaml
+- 04-tasks/task-trivy.yaml
 #- 05-pipelines/ci-pipeline-container.yaml
 #- 05-pipelines/ci-pipeline-maven-kaniko.yaml
 - 05-pipelines/ci-pipeline-maven-buildah.yaml

@@ -5,6 +5,8 @@
 #
 # Enhancements
 # - add sonar.login support as parameter (from a Secret)
+# - add context dir
+# - script optimizations
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -108,10 +110,8 @@ spec:
         echo "# Updated $(date '+%Y-%m-%d %H:%M:%S')" >> sonar-project.properties
 
         echo "---------------------------"
-        cat $sonarSettingsPath
-        echo "---------------------------"
-        cat $(workspaces.source.path)/$(params.CONTEXT_DIR)/sonar-project.properties
-
+        #cat $sonarSettingsPath
+        
     - name: sonar-scan
       image: docker.io/sonarsource/sonar-scanner-cli:4.5@sha256:b8c95a37025f3c13162118cd55761ea0b2a13d1837f9deec51b7b6d82c52040a #tag: 4.5
       workingDir: $(workspaces.source.path)/$(params.CONTEXT_DIR)
