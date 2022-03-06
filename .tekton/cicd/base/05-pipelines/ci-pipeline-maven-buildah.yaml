@@ -164,11 +164,6 @@ spec:
     taskRef:
       kind: Task
       name: buildah-tag-push
-    workspaces:
-    - name: source
-      workspace: shared-data
-    - name: sonar-settings
-      workspace: sonar-settings
   workspaces:
   - description: This workspace will receive the cloned git repo.
     name: shared-data
