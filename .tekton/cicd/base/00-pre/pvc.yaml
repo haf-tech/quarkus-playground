@@ -20,6 +20,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-100"
 spec:
+  storageClassName: ibmc-file-gold
   resources:
     requests:
       storage: 5Gi
