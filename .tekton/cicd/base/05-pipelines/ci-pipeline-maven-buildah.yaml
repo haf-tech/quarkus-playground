@@ -24,8 +24,10 @@ spec:
   - name: DOCKERFILE
     type: string
   - name: IMAGE
+    description: Image url (incl. tag/version) for a internal CR
     type: string
   - name: IMAGE_REMOTE_CR
+    description: Image url (incl. tag/version) for a remote CR
     type: string
   - name: GIT_REF
     type: string

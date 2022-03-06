@@ -26,6 +26,8 @@ spec:
       value: "./src/main/docker/Dockerfile.jvm"
     - name: IMAGE
       value: "image-registry.openshift-image-registry.svc:5000/demo-quarkus-cicd/quarkus-playground:latest"
+    - name: IMAGE_REMOTE_CR
+      value: "de.icr.io/demo/demo-quarkus/quarkus-playground:latest"
     - name: APP_IMAGE_BASE
       value: ""
     - name: APP_IMAGE_TAGS
