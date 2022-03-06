@@ -51,6 +51,12 @@ spec:
       value: "quarkus-demo"
     - name: SONAR_TOKEN_SECRET_NAME
       value: "sonarqube-token-secret"
+    - name: GIT_CONFIG_REPO
+      value: "https://github.com/haf-tech/quarkus-playground-config"
+    - name: GIT_CONFIG_REF
+      value: "test-promotion"
+    - name: REMOTE_CR_PUSH_ENABLED
+      value: "false"
   pipelineRef:
     name: ci-pipeline-maven-buildah
   serviceAccountName: pipeline

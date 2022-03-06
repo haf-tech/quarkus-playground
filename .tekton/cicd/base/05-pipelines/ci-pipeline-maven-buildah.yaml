@@ -111,7 +111,7 @@ spec:
     when:
       - input: "$(params.SONAR_ENABLED)"
         operator: in
-        values: ["true", "yes"]
+        values: ["true"]
     taskRef:
       kind: Task
       name: sonarqube-scanner
@@ -168,7 +168,7 @@ spec:
     when:
       - input: "$(params.REMOTE_CR_PUSH_ENABLED)"
         operator: in
-        values: ["true", "yes"]
+        values: ["true"]
     taskRef:
       kind: Task
       name: buildah-tag-push
