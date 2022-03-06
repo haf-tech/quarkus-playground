@@ -6,12 +6,21 @@
 # ClusterTasks based on Tekton Catalog 0.24
 #
 # apply with "create", otherwise the name will not be generated
-# oc create -f pipelinerun-maven.yaml
+# oc create -f pipelinerun-maven-ownerref.yaml
 #
+# This configuration holds an "ownerReferences" block. This is necessary in an ArgoCD environment
+# otherwise ArgoCD will immediately remove this created instance, because this manually created and not managed
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   generateName: quarkus-build-run-
+  ownerReferences:
+    - apiVersion: tekton.dev/v1beta1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Pipeline
+      name: ci-pipeline-maven-buildah
+      uid: b54d6dd1-d9b9-4173-a629-fa264aff4fb6
 spec:
   params:
     - name: REPO
