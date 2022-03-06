@@ -73,25 +73,49 @@ spec:
       volumeMounts:
         - mountPath: /var/lib/containers
           name: varlibcontainers
-      workingDir: $(workspaces.source.path)
+      #workingDir: $(workspaces.source.path)
       securityContext:
         privileged: true
     - image: $(params.BUILDER_IMAGE)
       name: push
       resources: {}
       script: |
+
+        imageUrl=$(params.IMAGE_NEW)
+
+        containerRegistryServer=$(echo $imageUrl | cut -d/ -f1)
+
+        if [[ -n "${REGISTRY_USER}" ]] && [[ -n "${REGISTRY_PASSWORD}" ]] && [[ "$containerRegistryServer" != "image-registry.openshift-image-registry.svc:5000"  ]]; then
+          buildah login -u "${REGISTRY_USER}" -p "${REGISTRY_PASSWORD}" "$containerRegistryServer"
+          echo "buildah login -u \"${REGISTRY_USER}\" -p \"xxxxx\" \"$containerRegistryServer\""
+        fi
+
+
         buildah --storage-driver=$(params.STORAGE_DRIVER) push \
           $(params.PUSH_EXTRA_ARGS) --tls-verify=$(params.TLSVERIFY) \
-          --digestfile $(workspaces.source.path)/image-digest $(params.IMAGE_NEW) \
+          --digestfile ./image-digest $(params.IMAGE_NEW) \
           docker://$(params.IMAGE_NEW)
       volumeMounts:
         - mountPath: /var/lib/containers
           name: varlibcontainers
-      workingDir: $(workspaces.source.path)
+      #workingDir: $(workspaces.source.path)
+      env:
+        - name: REGISTRY_USER
+          valueFrom:
+            secretKeyRef:
+              name: registry-access
+              key: REGISTRY_USER
+              optional: true
+        - name: REGISTRY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: registry-access
+              key: REGISTRY_PASSWORD
+              optional: true
       securityContext:
         privileged: true
   volumes:
     - emptyDir: {}
       name: varlibcontainers
-  workspaces:
-    - name: source
+  
+  
