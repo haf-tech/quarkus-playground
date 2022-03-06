@@ -92,7 +92,7 @@ spec:
       value: 
       - 'helm/values.dev.yaml'
     - name: EXPRESSION
-      value: 'image.digest=abcd:aaaa'
+      value: 'image.digest="abcd:aaaa"'
     runAfter:
     - clone-manifest
     when:
