@@ -8,7 +8,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   creationTimestamp: null
-  name: ci-pipeline-maven-buildah
+  name: ci-pipeline-promote
   annotations:
     argocd.argoproj.io/sync-wave: "-50"
 spec:
