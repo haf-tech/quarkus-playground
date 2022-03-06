@@ -1,0 +1,75 @@
+# Task: yq
+# Source: https://github.com/tektoncd/catalog/blob/main/task/yq/0.3/yq.yaml
+# v0.3
+#
+# Enhancements:
+# - context dir
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: promote-version
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: Developer Tools
+    tekton.dev/tags: git, yq, promotion
+    tekton.dev/displayName: "Promote version"
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    Promotes a version. Updates the configuration/manifest and push the updated manifest (with version/tag/digest) back to git
+  workspaces:
+    - name: source
+      description: A workspace that contains the file which needs to be altered.
+  params:
+    - name: FILES
+      type: array
+      description: A list of files to execute the expression on. Needs to be relative to the source workspace.
+    - name: EXPRESSION
+      type: string
+      description: The yq expression to apply. Can be used to replace yaml fields.
+    - name: YQ_IMAGE
+      type: string
+      description: The yq image to use.
+      default: docker.io/mikefarah/yq:4.16.2@sha256:0d4f6e27bdcac7316f635acd524ab0eecc4ad50834b54d10322268650c7712cb
+    - name: CONTEXT_DIR
+      type: string
+      description: Context directory
+      default: 'src_manifest'
+    - name: IMAGE_DIGEST
+      type: string
+      description: Image digest
+    - name: GIT_IMAGE
+      type: string
+      description: The git image to use.
+      default: registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:afc5d3f9efe26c7042635d43b8ffd09d67936e3d0b6b901dc08a33e20313d361
+  steps:
+    - name: replace-in-yaml
+      image: $(params.YQ_IMAGE)
+      workingDir: $(workspaces.source.path)/$(params.CONTEXT_DIR)
+      args: ["$(params.FILES[*])"]
+      script: |
+        #!/usr/bin/env sh
+        set -e
+
+        for var in "$@"
+        do
+            /usr/bin/yq eval -i "$(params.EXPRESSION)" "$var"
+        done
+    - name: push-git
+      image: $(params.GIT_IMAGE)
+      workingDir: $(workspaces.source.path)/$(params.CONTEXT_DIR)
+      script: |
+        #!/usr/bin/env sh
+        set -e
+
+        git config --global user.email "gitops@haddouti.com"
+        git config --global user.name "GitOps Pipeline"
+
+
+
+        git add "."
+        git commit -m "Updates "
+        git push -v

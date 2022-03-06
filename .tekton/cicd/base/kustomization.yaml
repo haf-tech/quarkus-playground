@@ -18,6 +18,8 @@ resources:
 - 04-tasks/task-sonarqube-scanner.yaml
 - 04-tasks/task-trivy.yaml
 - 04-tasks/task-ibm-va.yaml
+- 04-tasks/task-yq.yaml
+- 04-tasks/task-promote-version.yaml
 #- 05-pipelines/ci-pipeline-container.yaml
 #- 05-pipelines/ci-pipeline-maven-kaniko.yaml
 - 05-pipelines/ci-pipeline-maven-buildah.yaml

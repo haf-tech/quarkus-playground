@@ -98,9 +98,9 @@ spec:
     - image: $(params.BUILDER_IMAGE)
       name: digest-to-results
       resources: {}
-      script: >-
-        cat $(workspaces.source.path)/image-digest | tee
-        /tekton/results/IMAGE_DIGEST
+      script: |
+        #cat $(workspaces.source.path)/image-digest | tee /tekton/results/IMAGE_DIGEST
+        cat $(workspaces.source.path)/image-digest | tee $(results.IMAGE_DIGEST.path)
   volumes:
     - emptyDir: {}
       name: varlibcontainers

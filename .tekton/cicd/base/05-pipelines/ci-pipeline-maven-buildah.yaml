@@ -39,6 +39,10 @@ spec:
     type: string
   - name: GIT_REPO
     type: string
+  - name: GIT_CONFIG_REPO
+    type: string
+  - name: GIT_CONFIG_REF
+    type: string
   - name: MAVEN_GOALS
     type: array
   - name: SONAR_ENABLED
@@ -54,6 +58,10 @@ spec:
   - name: REMOTE_CR_PUSH_ENABLED
     type: string
     description: If tag and push to a remote CR is wanted or not
+    default: "true"
+  - name: PROMOTE_VERSION_ENABLED
+    type: string
+    description: If promoting version back to git is wanted
     default: "true"
   tasks:
   # ##################
@@ -164,6 +172,49 @@ spec:
     taskRef:
       kind: Task
       name: buildah-tag-push
+  # ##################
+  # Git clone manifest
+  - name: clone-manifest
+    params:
+    - name: url
+      value: $(params.GIT_CONFIG_REPO)
+    - name: revision
+      value: $(params.GIT_CONFIG_REF)
+    - name: subdirectory
+      value: 'src_manifest'
+    runAfter:
+    - img-scan-trivy
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+  # ##################
+  # Promote version and push back to git
+  - name: promote-version
+    params:
+    - name: CONTEXT_DIR
+      value: 'src_manifest'
+    - name: IMAGE_DIGEST
+      value: $(tasks.build-image.results.IMAGE_DIGEST)
+    - name: FILES
+      value: 
+      - 'helm/values.dev.yaml'
+    - name: EXPRESSION
+      value: 'image.digest=$(params.IMAGE_DIGEST)'
+    runAfter:
+    - clone-manifest
+    when:
+      - input: "$(params.PROMOTE_VERSION_ENABLED)"
+        operator: in
+        values: ["true", "yes"]
+    taskRef:
+      kind: Task
+      name: promote-version
+    workspaces:
+    - name: output
+      workspace: shared-data
   workspaces:
   - description: This workspace will receive the cloned git repo.
     name: shared-data
@@ -171,4 +222,3 @@ spec:
     name: maven-settings
   - description: This workspace will hold the SonarQube Settings (temp dir).
     name: sonar-settings
-
