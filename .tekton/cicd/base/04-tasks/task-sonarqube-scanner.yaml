@@ -1,13 +1,17 @@
 # Task: SonarQube Scanner
 # Source: https://github.com/tektoncd/catalog/blob/main/task/sonarqube-scanner/0.2/sonarqube-scanner.yaml
 # Tekton Hub: https://hub.tekton.dev/tekton/task/sonarqube-scanner
+# v0.2 - enhanced
+#
+# Enhancements
+# - add sonar.login support as parameter
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: sonarqube-scanner
   labels:
-    app.kubernetes.io/version: "0.2"
+    app.kubernetes.io/version: "0.2.1"
   annotations:
     tekton.dev/pipelines.minVersion: "0.12.1"
     tekton.dev/categories: Security
@@ -33,6 +37,9 @@ spec:
       default: ""
     - name: SONAR_PROJECT_KEY
       description: Project's unique key
+      default: ""
+    - name: SONAR_TOKEN
+      description: Token for sonar.login
       default: ""
   steps:
     - name: sonar-properties-create
@@ -68,10 +75,14 @@ spec:
           if [[ -n "$(params.SONAR_PROJECT_KEY)" ]]; then
             replaceValues $(workspaces.source.path)/sonar-project.properties sonar.projectKey $(params.SONAR_PROJECT_KEY)
           fi
+          if [[ -n "$(params.SONAR_TOKEN)" ]]; then
+            replaceValues $(workspaces.source.path)/sonar-project.properties sonar.login $(params.SONAR_TOKEN)
+          fi
         else
           touch sonar-project.properties
           echo "sonar.projectKey=$(params.SONAR_PROJECT_KEY)" >> sonar-project.properties
           echo "sonar.host.url=$(params.SONAR_HOST_URL)" >> sonar-project.properties
+          echo "sonar.login=$(params.SONAR_TOKEN)" >> sonar-project.properties
           echo "sonar.sources=." >> sonar-project.properties
         fi
 
