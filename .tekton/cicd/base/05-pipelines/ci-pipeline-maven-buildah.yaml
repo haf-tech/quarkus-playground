@@ -37,6 +37,8 @@ spec:
     type: string
   - name: MAVEN_GOALS
     type: array
+  - name: SONAR_ENABLED
+    type: string
   - name: SONAR_PROJECT_KEY
     type: string
   - name: SONAR_TOKEN_SECRET_NAME
@@ -88,6 +90,10 @@ spec:
       value: $(params.SONAR_TOKEN_SECRET_NAME)
     runAfter:
     - build-app
+    when:
+      - input: "$(params.SONAR_ENABLED)"
+        operator: in
+        values: ["true", "yes"]
     taskRef:
       #kind: ClusterTask
       #name: maven

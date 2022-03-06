@@ -348,6 +348,35 @@ curl -N http://127.0.0.1:8080/v1/importantevents
 * Quarkus Kafka Reference Guide: link:https://quarkus.io/guides/kafka[]
 * Quarkus Kafka Cloud Events: link:https://quarkus.io/blog/kafka-cloud-events/[]
 
+=== Testing
+
+Jacoco is integrated and a `./mvnw verify` creates a Jacoco report into `target/jacoco-report`.
+
+The `sonar-project.properties` holds also the main general and Java related parameters to support SonarQube Scanner activities.
+
+[source]
+----
+# ...
+
+sonar.sources=src/main/java
+sonar.tests=src/test/java
+
+# #######
+# Java specific parameters
+
+sonar.java.binaries=target/classes
+sonar.java.libraries=target/**/*.jar
+sonar.java.test.binaries=target/test-classes
+sonar.java.test.libraries=target/**/*.jar
+----
+
+==== References
+
+
+* Quarkus and test coverage: link:https://quarkus.io/guides/tests-with-coverage[]
+* SonarQube - Analysis Parameters Java: link:https://docs.sonarqube.org/latest/analysis/languages/java/[]
+
+
 == Differentiation Quarkus and JEE/Spec/Other
 
 Quarkus tries to integrate best practices and (JEE) specifications
