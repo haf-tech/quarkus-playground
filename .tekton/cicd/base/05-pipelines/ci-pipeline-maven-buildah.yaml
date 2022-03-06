@@ -39,6 +39,7 @@ spec:
     type: array
   - name: SONAR_ENABLED
     type: string
+    default: "false"
   - name: SONAR_PROJECT_KEY
     type: string
   - name: SONAR_TOKEN_SECRET_NAME
