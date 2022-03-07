@@ -24,6 +24,61 @@ spec:
     - name: source
       description: A workspace that contains the file which needs to be altered.
   params:
+    - description: git url to clone
+      name: GIT_URL
+      type: string
+    - default: ''
+      description: 'git revision to checkout (branch, tag, sha, ref…)'
+      name: GIT_REVISION
+      type: string
+    - default: ''
+      description: (optional) git refspec to fetch before checking out revision
+      name: GIT_REF
+      type: string
+    - default: 'true'
+      description: defines if the resource should initialize and fetch the submodules
+      name: GIT_SUBMODULES
+      type: string
+    - default: '1'
+      description: >-
+        performs a shallow clone where only the most recent commit(s) will be
+        fetched
+      name: GIT_DEPTH
+      type: string
+    - default: 'true'
+      description: >-
+        defines if http.sslVerify should be set to true or false in the global
+        git config
+      name: GIT_SSL_VERIFY
+      type: string
+    - default: ''
+      description: >-
+        defines which directories patterns to match or exclude when performing a
+        sparse checkout
+      name: GIT_SPARSE_CHECKOUT_DIRS
+      type: string
+    - default: 'true'
+      description: >-
+        clean out the contents of the repo's destination directory (if it
+        already exists) before trying to clone the repo there
+      name: GIT_DELETE_EXISTING
+      type: string
+    - default: ''
+      description: git HTTP proxy server for non-SSL requests
+      name: HTTP_PROXY
+      type: string
+    - default: ''
+      description: git HTTPS proxy server for SSL requests
+      name: HTTPS_PROXY
+      type: string
+    - default: ''
+      description: git no proxy - opt out of proxying HTTP/HTTPS requests
+      name: NO_PROXY
+      type: string
+    - default: 'true'
+      description: log the commands used during execution
+      name: VERBOSE
+      type: string
     - name: FILES
       type: array
       description: A list of files to execute the expression on. Needs to be relative to the source workspace.
@@ -46,6 +101,76 @@ spec:
       description: The git image to use.
       default: registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:afc5d3f9efe26c7042635d43b8ffd09d67936e3d0b6b901dc08a33e20313d361
   steps:
+    - image: $(params.GIT_IMAGE)
+      name: clone
+      resources: {}
+      script: >
+        #!/bin/sh
+
+        set -eu -o pipefail
+
+
+        if [[ "$(params.VERBOSE)" == "true" ]] ; then
+          set -x
+        fi
+
+
+        CHECKOUT_DIR="$(workspaces.output.path)/$(params.CONTEXT_DIR)"
+
+
+        cleandir() {
+          # Delete any existing contents of the repo directory if it exists.
+          #
+          # We don't just "rm -rf $CHECKOUT_DIR" because $CHECKOUT_DIR might be "/"
+          # or the root of a mounted volume.
+          if [[ -d "$CHECKOUT_DIR" ]] ; then
+            # Delete non-hidden files and directories
+            rm -rf "$CHECKOUT_DIR"/*
+            # Delete files and directories starting with . but excluding ..
+            rm -rf "$CHECKOUT_DIR"/.[!.]*
+            # Delete files and directories starting with .. plus any other character
+            rm -rf "$CHECKOUT_DIR"/..?*
+          fi
+        }
+
+
+        if [[ "$(params.GIT_DELETE_EXISTING)" == "true" ]] ; then
+          cleandir
+        fi
+
+
+        test -z "$(params.HTTP_PROXY)" || export HTTP_PROXY=$(params.HTTP_PROXY)
+
+        test -z "$(params.HTTPS_PROXY)" || export
+        HTTPS_PROXY=$(params.HTTPS_PROXY)
+
+        test -z "$(params.NO_PROXY)" || export NO_PROXY=$(params.NO_PROXY)
+
+
+        /ko-app/git-init \
+          -url "$(params.GIT_URL)" \
+          -revision "$(params.GIT_REVISION)" \
+          -refspec "$(params.GIT_REF)" \
+          -path "$CHECKOUT_DIR" \
+          -sslVerify="$(params.GIT_SSL_VERIFY)" \
+          -submodules="$(params.GIT_SUBMODULES)" \
+          -depth "$(params.GIT_DEPTH)" \
+          -sparseCheckoutDirectories "$(params.GIT_SPARSE_CHECKOUT_DIRS)"
+        cd "$CHECKOUT_DIR"
+
+        RESULT_SHA="$(git rev-parse HEAD)"
+
+        EXIT_CODE="$?"
+
+        if [ "$EXIT_CODE" != 0 ] ; then
+          exit $EXIT_CODE
+        fi
+
+        # ensure we don't add a trailing newline to the result
+
+        echo -n "$RESULT_SHA" > $(results.commit.path)
+
+        echo -n "$(params.GIT_URL)" > $(results.url.path)
     - name: replace-in-yaml
       image: $(params.YQ_IMAGE)
       workingDir: $(workspaces.source.path)/$(params.CONTEXT_DIR)
