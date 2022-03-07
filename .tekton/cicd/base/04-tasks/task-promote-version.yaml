@@ -108,7 +108,6 @@ spec:
   steps:
     - image: $(params.GIT_IMAGE)
       name: clone
-      resources: {}
       script: >
         #!/bin/sh
 
@@ -168,13 +167,16 @@ spec:
         echo -n "$RESULT_SHA" > $(results.commit.path)
 
         echo -n "$(params.GIT_URL)" > $(results.url.path)
+
+        id
     - name: replace-in-yaml
       image: $(params.YQ_IMAGE)
       workingDir: $(workspaces.source.path)/yq
       args: ["$(params.FILES[*])"]
       script: |
-        #!/usr/bin/env sh
-        set -e
+        #!/bin/sh
+
+        id
 
         workDir=$(workspaces.source.path)/yq
         echo "---------------"
@@ -193,8 +195,7 @@ spec:
       image: $(params.GIT_IMAGE)
       workingDir: $(workspaces.source.path)/$(params.CONTEXT_DIR)
       script: |
-        #!/usr/bin/env sh
-        set -e
+        #!/bin/sh
 
         git config --global user.email "gitops@haddouti.com"
         git config --global user.name "GitOps Pipeline"
