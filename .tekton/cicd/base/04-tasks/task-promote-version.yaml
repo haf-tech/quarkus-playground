@@ -107,8 +107,9 @@ spec:
       name: url
   steps:
     - image: $(params.GIT_IMAGE)
-      name: clone
+      name: clone-replace-push
       resources: {}
+      args: ["$(params.FILES[*])"]
       script: >
         #!/bin/sh
 
@@ -168,6 +169,23 @@ spec:
         echo -n "$RESULT_SHA" > $(results.commit.path)
 
         echo -n "$(params.GIT_URL)" > $(results.url.path)
+
+
+        for var in "$@"
+        do
+            /usr/bin/yq eval '$(params.EXPRESSION)' -i "$(pwd)/$var" -v
+            #/usr/bin/yq eval '$(params.EXPRESSION)' -i "$workDir/$var" -v
+        done
+
+        git config --global user.email "gitops@haddouti.com"
+        git config --global user.name "GitOps Pipeline"
+
+
+
+        git add "."
+        git commit -m "Updates "
+        git push -v
+        
     - name: replace-in-yaml
       image: $(params.YQ_IMAGE)
       workingDir: $(workspaces.source.path)/yq
