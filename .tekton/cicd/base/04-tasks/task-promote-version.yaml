@@ -115,7 +115,7 @@ spec:
         fi
 
 
-        CHECKOUT_DIR="$(workspaces.output.path)/$(params.CONTEXT_DIR)"
+        CHECKOUT_DIR="$(workspaces.source.path)/$(params.CONTEXT_DIR)"
 
 
         cleandir() {
