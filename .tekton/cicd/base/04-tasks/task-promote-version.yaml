@@ -178,10 +178,10 @@ spec:
 
         workDir=$(workspaces.source.path)/yq
         echo "---------------"
-        echo pwd
+        echo $(pwd)
         echo $workDir
         echo "---------------"
-        cp -r $(workspaces.source.path)/$(params.CONTEXT_DIR)/ $workDir
+        cp -r $(workspaces.source.path)/$(params.CONTEXT_DIR)/* $workDir
         chmod -R +w $workDir
 
         for var in "$@"
