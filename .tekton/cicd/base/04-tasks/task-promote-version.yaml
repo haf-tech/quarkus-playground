@@ -176,9 +176,14 @@ spec:
         #!/usr/bin/env sh
         set -e
 
+        workDir=$(workspaces.source.path)/yq
+        cp -r $(workspaces.source.path)/$(params.CONTEXT_DIR) $workDir
+        chmod -R +w $workDir
+
         for var in "$@"
         do
-            /usr/bin/yq eval '$(params.EXPRESSION)' -i "$(pwd)/$var" -v
+            #/usr/bin/yq eval '$(params.EXPRESSION)' -i "$(pwd)/$var" -v
+            /usr/bin/yq eval '$(params.EXPRESSION)' -i "$workDir/$var" -v
         done
     - name: push-git
       image: $(params.GIT_IMAGE)
