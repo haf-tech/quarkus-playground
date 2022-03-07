@@ -29,8 +29,8 @@ spec:
   - name: IMAGE_REMOTE_CR
     description: Image url (incl. tag/version) for a remote CR
     type: string
-  - name: GIT_REF
-    type: string
+  #- name: GIT_REF
+  #  type: string
   - name: COMMIT_DATE
     type: string
   - name: COMMIT_AUTHOR
