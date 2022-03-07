@@ -73,7 +73,7 @@ spec:
     - name: revision
       value: $(params.GIT_CONFIG_REF)
     - name: subdirectory
-      value: 'src_manifest'
+      value: 'src_manifest2'
     when:
       - input: "$(params.REMOTE_CR_PUSH_ENABLED)"
         operator: in
@@ -93,7 +93,7 @@ spec:
     - name: GIT_REF
       value: $(params.GIT_CONFIG_REF)
     - name: CONTEXT_DIR
-      value: 'src_manifest'
+      value: 'src_manifest2'
     - name: IMAGE_DIGEST
       value: 'aaaaa'
     - name: FILES
