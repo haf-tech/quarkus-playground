@@ -170,7 +170,7 @@ spec:
         echo -n "$(params.GIT_URL)" > $(results.url.path)
     - name: replace-in-yaml
       image: $(params.YQ_IMAGE)
-      workingDir: $(workspaces.source.path)/$(params.CONTEXT_DIR)
+      workingDir: $(workspaces.source.path)/yq
       args: ["$(params.FILES[*])"]
       script: |
         #!/usr/bin/env sh
