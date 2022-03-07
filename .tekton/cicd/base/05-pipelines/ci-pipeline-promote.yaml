@@ -66,24 +66,7 @@ spec:
   tasks:
   # ##################
   # Git clone manifest
-  - name: clone-manifest
-    params:
-    - name: url
-      value: $(params.GIT_CONFIG_REPO)
-    - name: revision
-      value: $(params.GIT_CONFIG_REF)
-    - name: subdirectory
-      value: 'src_manifest'
-    when:
-      - input: "$(params.REMOTE_CR_PUSH_ENABLED)"
-        operator: in
-        values: ["never111"]
-    taskRef:
-      kind: ClusterTask
-      name: git-clone
-    workspaces:
-    - name: output
-      workspace: shared-data
+  
   # ##################
   # Promote version and push back to git
   - name: promote-version
