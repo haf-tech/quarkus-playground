@@ -66,7 +66,24 @@ spec:
   tasks:
   # ##################
   # Git clone manifest
-  
+  - name: clone-manifest
+    params:
+    - name: url
+      value: $(params.GIT_CONFIG_REPO)
+    - name: revision
+      value: $(params.GIT_CONFIG_REF)
+    - name: subdirectory
+      value: 'src_manifest'
+    when:
+      - input: "$(params.REMOTE_CR_PUSH_ENABLED)"
+        operator: in
+        values: ["never111"]
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
   # ##################
   # Promote version and push back to git
   - name: promote-version
@@ -84,8 +101,8 @@ spec:
       - 'helm/values.dev.yaml'
     - name: EXPRESSION
       value: '.image.digest="sha256:3663791abc50c432fd8c214ce8a5197f6e44ca80a0600c4352ddc7e173450a9b"'
-    runAfter:
-    - clone-manifest
+    #runAfter:
+    #- clone-manifest
     when:
       - input: "$(params.PROMOTE_VERSION_ENABLED)"
         operator: in
