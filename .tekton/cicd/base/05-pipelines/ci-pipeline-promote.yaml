@@ -90,7 +90,7 @@ spec:
     params:
     - name: GIT_URL
       value: $(params.GIT_CONFIG_REPO)
-    - name: GIT_REF
+    - name: GIT_REVISION
       value: $(params.GIT_CONFIG_REF)
     - name: CONTEXT_DIR
       value: 'src_manifest2'
