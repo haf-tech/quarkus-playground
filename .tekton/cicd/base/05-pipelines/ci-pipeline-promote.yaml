@@ -95,7 +95,7 @@ spec:
     - name: CONTEXT_DIR
       value: 'src_manifest'
     - name: IMAGE_DIGEST
-      value: $(tasks.build-image.results.IMAGE_DIGEST)
+      value: 'aaaaa'
     - name: FILES
       value: 
       - 'helm/values.dev.yaml'
