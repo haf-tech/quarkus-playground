@@ -93,7 +93,7 @@ spec:
     - name: GIT_REVISION
       value: $(params.GIT_CONFIG_REF)
     - name: CONTEXT_DIR
-      value: 'src_manifest2'
+      value: 'src_manifest3'
     - name: IMAGE_DIGEST
       value: 'aaaaa'
     - name: FILES

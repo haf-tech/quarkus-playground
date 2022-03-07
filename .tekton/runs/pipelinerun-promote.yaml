@@ -59,6 +59,10 @@ spec:
       value: "false"
   pipelineRef:
     name: ci-pipeline-promote
+  podTemplate:
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1001
   serviceAccountName: pipeline
   workspaces:
   - name: maven-settings
