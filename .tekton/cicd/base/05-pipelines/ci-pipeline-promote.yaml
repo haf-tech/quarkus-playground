@@ -74,6 +74,10 @@ spec:
       value: $(params.GIT_CONFIG_REF)
     - name: subdirectory
       value: 'src_manifest'
+    when:
+      - input: "$(params.REMOTE_CR_PUSH_ENABLED)"
+        operator: in
+        values: ["never111"]
     taskRef:
       kind: ClusterTask
       name: git-clone
@@ -84,10 +88,14 @@ spec:
   # Promote version and push back to git
   - name: promote-version
     params:
+    - name: GIT_URL
+      value: $(params.GIT_CONFIG_REPO)
+    - name: GIT_REVISION
+      value: $(params.GIT_CONFIG_REF)
     - name: CONTEXT_DIR
       value: 'src_manifest'
     - name: IMAGE_DIGEST
-      value: 'abcd'
+      value: $(tasks.build-image.results.IMAGE_DIGEST)
     - name: FILES
       value: 
       - 'helm/values.dev.yaml'
