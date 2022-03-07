@@ -148,7 +148,7 @@ spec:
 
         echo "$(params.GIT_URL) - $(params.GIT_REF) - $CHECKOUT_DIR - $(params.GIT_SPARSE_CHECKOUT_DIRS)"
 
-        /ko-app/git-init -url "$(params.GIT_URL)" -revision "$(params.GIT_REVISION)" -refspec "$(params.GIT_REF)" -path "$CHECKOUT_DIR" -sslVerify="$(params.GIT_SSL_VERIFY)" -submodules=true -depth 1 -sparseCheckoutDirectories ''
+        /ko-app/git-init -url "$(params.GIT_URL)" -revision "$(params.GIT_REVISION)" -refspec "$(params.GIT_REF)" -path "$CHECKOUT_DIR" -sslVerify="$(params.GIT_SSL_VERIFY)" -submodules="$(params.GIT_SUBMODULES)" -depth 1 -sparseCheckoutDirectories ''
 
         cd "$CHECKOUT_DIR"
 
