@@ -55,16 +55,18 @@ spec:
       value: "https://github.com/haf-tech/quarkus-playground-config"
     - name: GIT_CONFIG_REF
       value: "test-promotion"
+    - name: CONTEXT_DIR
+      value: "src_m4"
     - name: REMOTE_CR_PUSH_ENABLED
       value: "false"
   pipelineRef:
     name: ci-pipeline-promote
-#  podTemplate:
-#    securityContext:
-#      runAsNonRoot: true
-#      runAsUser: 1000
-#      runAsGroup: 2000
-#      fsGroup: 3000
+  podTemplate:
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 0
+      fsGroup: 0
   serviceAccountName: pipeline
   workspaces:
   - name: maven-settings

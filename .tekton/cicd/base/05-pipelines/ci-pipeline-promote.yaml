@@ -43,6 +43,8 @@ spec:
     type: string
   - name: GIT_CONFIG_REF
     type: string
+  - name: CONTEXT_DIR
+    type: string
   - name: MAVEN_GOALS
     type: array
   - name: SONAR_ENABLED
@@ -93,7 +95,7 @@ spec:
     - name: GIT_REVISION
       value: $(params.GIT_CONFIG_REF)
     - name: CONTEXT_DIR
-      value: 'src_manifest3'
+      value: $(params.CONTEXT_DIR)
     - name: IMAGE_DIGEST
       value: 'aaaaa'
     - name: FILES
