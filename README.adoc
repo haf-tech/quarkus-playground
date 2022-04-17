@@ -132,8 +132,17 @@ This chapters summarize the integrated technologies and components in the applic
 | JUnit5 | JUnit
 | RESTassured | REST test framework
 | Jacoco | Test coverage support
+| SBOM | Software Bill of Materials, with CycloneDX
 
 |===
+
+=== Software Bill of Materials (SBOM)
+
+A Software Bill of Materials (SBOM) is like an inventory holding information about the libraries, components with their version, license, publisher etc information. All this information are helpful and essential for validating the integriy of the entire supply chain process and security.
+The main solutions generating SBOMs are link:https://cyclonedx.org[CycloneDX] and link:https://spdx.dev/[SPDX].
+
+The link:https://github.com/CycloneDX/cyclonedx-maven-plugin[maven plugin of CycloneDX] is integrated and executed during `package` phase. Result is a `sbom.json` / `sbom.xml` file holding all the information and could be used in dependency and component risk analysis platforms like link:https://dependencytrack.org/[Dependency-Track].
+
 
 === OpenId Connect and OAuth2
 
