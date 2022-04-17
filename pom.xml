@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.haddouti</groupId>
 	<artifactId>quarkus-playground</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
+	<version>1.0.5-SNAPSHOT</version>
 	<properties>
 		<compiler-plugin.version>3.8.1</compiler-plugin.version>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
@@ -141,6 +141,18 @@
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-jdbc-h2</artifactId>
+			<!-- H2 til 2.0.202 has vuln. -->
+			<exclusions>
+				<exclusion>
+					<groupId>com.h2database</groupId>
+					<artifactId>h2</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.1.210</version>
 		</dependency>
 
 		<dependency>
