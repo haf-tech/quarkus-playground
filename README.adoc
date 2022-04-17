@@ -143,6 +143,30 @@ The main solutions generating SBOMs are link:https://cyclonedx.org[CycloneDX] an
 
 The link:https://github.com/CycloneDX/cyclonedx-maven-plugin[maven plugin of CycloneDX] is integrated and executed during `package` phase. Result is a `sbom.json` / `sbom.xml` file holding all the information and could be used in dependency and component risk analysis platforms like link:https://dependencytrack.org/[Dependency-Track].
 
+If only the SBOM generation should be execute use the following command
+
+----
+$ ./mvnw cyclonedx:makeAggregateBom
+
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------< com.haddouti:quarkus-playground >-------------------
+[INFO] Building quarkus-playground 1.0.4-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- cyclonedx-maven-plugin:2.5.3:makeAggregateBom (default-cli) @ quarkus-playground ---
+[INFO] CycloneDX: Creating BOM
+[INFO] CycloneDX: Writing BOM (XML): /workspaces/repos/haf-tech/quarkus-playground/target/sbom.xml
+[INFO] CycloneDX: Validating BOM (XML): /workspaces/repos/haf-tech/quarkus-playground/target/sbom.xml
+[INFO] CycloneDX: Writing BOM (JSON): /workspaces/repos/haf-tech/quarkus-playground/target/sbom.json
+[INFO] CycloneDX: Validating BOM (JSON): /workspaces/repos/haf-tech/quarkus-playground/target/sbom.json
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.284 s
+[INFO] Finished at: 2022-04-17T12:44:23+02:00
+[INFO] ------------------------------------------------------------------------
+----
 
 === OpenId Connect and OAuth2
 
