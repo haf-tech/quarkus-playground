@@ -107,6 +107,13 @@ helm3 template rel1 quarkus-playground -f quarkus-playground/values.test.yaml --
 oc apply -f work/quarkus-playground/templates/
 ----
 
+
+.Update the mvn wrapper
+----
+./mvnw -N wrapper:wrapper -Dmaven=3.8.5
+----
+
+
 == Technologies
 
 This chapters summarize the integrated technologies and components in the application
@@ -166,6 +173,38 @@ $ ./mvnw cyclonedx:makeAggregateBom
 [INFO] Total time:  7.284 s
 [INFO] Finished at: 2022-04-17T12:44:23+02:00
 [INFO] ------------------------------------------------------------------------
+----
+
+The relevant configuration in the `pom.xml` looks like the following snippet
+
+[source,xml]
+----
+      <plugin>
+				<groupId>org.cyclonedx</groupId>
+				<artifactId>cyclonedx-maven-plugin</artifactId>
+				<version>2.5.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>makeAggregateBom</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<projectType>library</projectType>
+					<schemaVersion>1.3</schemaVersion>
+					<includeBomSerialNumber>true</includeBomSerialNumber>
+					<includeCompileScope>true</includeCompileScope>
+					<includeProvidedScope>true</includeProvidedScope>
+					<includeRuntimeScope>true</includeRuntimeScope>
+					<includeSystemScope>true</includeSystemScope>
+					<includeTestScope>false</includeTestScope>
+					<includeLicenseText>false</includeLicenseText>
+					<outputFormat>all</outputFormat>
+					<outputName>sbom</outputName>
+				</configuration>
+			</plugin>
 ----
 
 === OpenId Connect and OAuth2
