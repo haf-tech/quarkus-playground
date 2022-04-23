@@ -986,4 +986,4 @@ link:https://developercertificate.org/[Developer Certificate of Origin, Version 
 link:https://www.apache.org/licenses/LICENSE-2.0.txt[Apache License, Version 2].
 
 See also link:https://www.apache.org/foundation/license-faq.html#WhatDoesItMEAN[Apache License FAQ]
-.
+. 
