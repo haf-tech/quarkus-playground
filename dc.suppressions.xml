@@ -3,16 +3,11 @@
 
     <suppress>
         <notes><![CDATA[
-   file name: quarkus-playground-1.0.6-SNAPSHOT.jar
-   ]]>        </notes>
-        <sha1>8db96eeae461db9fb4624f1c4c0973a6c9f556af</sha1>
+        This suppresses a CVE identified by OSS Index using the vulnerability name and packageUrl.
+        Apache Maven 3.8.1, in Quarkus
+        ]]>        </notes>
+        <vulnerabilityName>CVE-2021-26291</vulnerabilityName>
         <cve>CVE-2021-26291</cve>
     </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: quarkus-run.jar
-   ]]>        </notes>
-        <sha1>7fe39cc49a5d4c667a9a75554b6023c2012ffd10</sha1>
-        <cve>CVE-2021-26291</cve>
-    </suppress>
+   
 </suppressions>
