@@ -3,7 +3,7 @@
 
     <suppress>
         <notes><![CDATA[
-        This suppresses a CVE identified by OSS Index using the vulnerability name and packageUrl.
+        This suppresses a CVE.
         Apache Maven 3.8.1, in Quarkus
         ]]>        </notes>
         <vulnerabilityName>CVE-2021-26291</vulnerabilityName>

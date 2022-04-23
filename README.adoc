@@ -962,6 +962,26 @@ https://demo-ce-quarkus.e19mnwb24sf.eu-de.codeengine.appdomain.cloud
 * IBM Cloud Code Engine - link:https://github.com/IBM/CodeEngine[GitHub: Examples]
 * IBM Cloud Code Engine - link:https://cloud.ibm.com/docs/codeengine?topic=codeengine-mem-cpu-combo[CPU-Memory Combo]
 
+== Pipeline
+
+=== Dependency Check
+
+The link:https://owasp.org/www-project-dependency-check/[OWASP dependency-check] is a great solution to check the dependencies agains various CVE databases.
+However, as also stated in the link:https://jeremylong.github.io/DependencyCheck/[documentation], false positives are possible. In such cases is it possible to create a `suppression` file listing the files or CVE to ignore.
+
+[source,xml]
+----
+include::dc.suppressions.xml[]
+----
+
+NOTE: Reconsider whether this exception is really correct! A fix and solving of the issue always the right and better way.
+
+.References
+* link:https://owasp.org/Top10/[OWASP Top 10]
+* link:https://owasp.org/www-project-dependency-check/[OWASP Dependency-Check - Project page]
+* link:https://jeremylong.github.io/DependencyCheck/[Dependency-Check docu]
+* link:https://github.com/jeremylong/DependencyCheck[GitHub: dependency-check]
+
 == Summary
 
 A playground app handling various modern aspects with Quarkus. 
