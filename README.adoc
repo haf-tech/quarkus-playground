@@ -4,7 +4,7 @@
 :toclevels: 4
 :sectlinks:
 :sectanchors:
-
+ 
 A link:https://quarkus.io/[Quarkus] playground application. 
 
 toc::[]
