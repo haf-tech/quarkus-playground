@@ -11,5 +11,11 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    {{- if .Values.config.jmx.enabled }}
+    - port: {{ .Values.service.jmxPort }}
+      targetPort: {{ .Values.service.jmxPort }}
+      protocol: TCP
+      name: jfr-jmx
+    {{- end }}
   selector:
     {{- include "quarkus-playground.selectorLabels" . | nindent 4 }}

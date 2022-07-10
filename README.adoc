@@ -420,6 +420,62 @@ curl -N http://127.0.0.1:8080/v1/importantevents
 * Quarkus Kafka Reference Guide: link:https://quarkus.io/guides/kafka[]
 * Quarkus Kafka Cloud Events: link:https://quarkus.io/blog/kafka-cloud-events/[]
 
+=== JVM Profiling
+
+With JDK Flight Recorder (JFR) and JDK Mission Control (JMC) exists mature product to profile and monitore a JVM application, collecting various (custom) events. To be able to benefit in the Kubernetes/OpenShift ecosystem also from such features sponsored Red Hat link:https://github.com/cryostatio/cryostat[Cryostat]. Simplified Cryostat acts as a JMX bridge to a JVM application and provides handy UI anf functionality to interact with JVMs and record the events.
+
+To enable this feature the following adjustments are needed
+
+* Installed Cryostat Operator
+* Expose the JMX port in the application
+* Expose the JMX port in the Kubernetes Service using the default name `jfr-jmx`
+
+For Quarkus are usually no code or configuration changes needed. At the time of writing contains the JVM-mode build all the JMX features and one have only to expose the port. The deployment into a Kubernetes/OpenShift cluster needs the meta information to expose the JMX port.
+
+The deployment needs the JMX environment parameters like
+
+[source,yaml]
+----
+env:
+  - name: JAVA_OPTS_APPEND
+    value: >-
+    -Dcom.sun.management.jmxremote
+    -Dcom.sun.management.jmxremote.port=9998
+    -Dcom.sun.management.jmxremote.rmi.port=9998
+    -Djava.rmi.server.hostname=quarkus-playground-s2i.demo-jfr
+    -Dcom.sun.management.jmxremote.authenticate=false
+    -Dcom.sun.management.jmxremote.ssl=false
+    -Dcom.sun.management.jmxremote.local.only=false
+----
+
+[source,yaml]
+----
+ports:
+    #...
+    - port: 9998
+      targetPort: 9998
+      protocol: TCP
+      name: jfr-jmx
+----
+
+Important is, to set the right `java.rmi.server.hostname` to the Service name and namespace, also the right JMX port.
+
+The helm chart of this playground reflect such parameters.
+
+Running Cryostat in the same namespace, will the internal autodiscovery detects the JMX endpoint, cause using the default name `jfr-jmx`. This will register the application target in Cryostat. The recording of the events and first analyses can then be carried out directly in the Cryostat UI.
+
+image::static/cryostat-recording.png[]
+
+.Side notes
+* The here used JMX configuration is without security. Also the JFR Analysis list this as setting for improvement
+* If the app is not running in the same namespace, register the target manually using the URL like: `service:jmx:rmi:///jndi/rmi://quarkus-playground-s2i.demo-jfr:9998/jmxrmi` 
+
+==== References
+
+* Cryostat Mainpage: link:https://cryostat.io/[]
+* Article series from Red Hat about Cryostat: link:https://developers.redhat.com/articles/2021/10/18/announcing-cryostat-20-jdk-flight-recorder-containers[]
+* Java Mission Control: link:https://adoptium.net/jmc[]
+
 === Testing
 
 Jacoco is integrated and a `./mvnw verify` creates a Jacoco report into `target/jacoco-report`.

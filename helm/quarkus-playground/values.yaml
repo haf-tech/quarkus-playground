@@ -8,6 +8,16 @@ owner: lab-tech
 config:
   configmap: 
   secret: 
+  jmx:
+    enabled: true
+  # consider to adjust hostname to <service name.namespace>
+  additionalJavaOptions: '-Dcom.sun.management.jmxremote
+    -Dcom.sun.management.jmxremote.port=9998
+    -Dcom.sun.management.jmxremote.rmi.port=9998
+    -Djava.rmi.server.hostname=quarkus-playground-svc.demo-jfr
+    -Dcom.sun.management.jmxremote.authenticate=false
+    -Dcom.sun.management.jmxremote.ssl=false
+    -Dcom.sun.management.jmxremote.local.only=false'
 
 image:
   repository: nginx
@@ -54,6 +64,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 8080
+  jmxPort: 9998
 
 ingress:
   enabled: false

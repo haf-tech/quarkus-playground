@@ -50,6 +50,11 @@ spec:
               name: {{ . }}
           {{- end }}
           {{- end }}
+          {{- if ((.Values.config).jmx.enabled) }}         
+          env:
+          - name: JAVA_OPTS_APPEND
+            value: {{ .Values.config.additionalJavaOptions | quote }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
